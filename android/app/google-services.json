@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "145240505070",
+    "firebase_url": "https://mealbuddy-e829c-default-rtdb.firebaseio.com",
+    "project_id": "mealbuddy-e829c",
+    "storage_bucket": "mealbuddy-e829c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145240505070:android:6a9e5e6dd255b0b5d8d1ff",
+        "android_client_info": {
+          "package_name": "com.example.meal_recommender"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD09mQOfkgvaXEjiKIGaDJy44YLm8YhOEI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
