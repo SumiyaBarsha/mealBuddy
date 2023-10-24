@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meal_recommender/profile_page.dart';
 
 import 'dritool.dart';
 
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
     SettingsPage(),*/
   ];
 
-  Future<void> _selectDate(BuildContext context) async {
+  _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -50,7 +51,9 @@ class _HomePageState extends State<HomePage> {
       lastDate: DateTime(2101),
     );
     if (picked != null && picked != selectedDate) {
-      selectedDate = picked;
+      setState(() {
+        selectedDate = picked;
+      });
     }
   }
   @override
@@ -84,21 +87,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.medical_information),
-                    color: Colors.white,
-                    onPressed: () {
-                        // Navigate to second page when the button is pressed!
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => DRIToolPage()),
-                        );
-                    },
-                  ),
-                  IconButton(
                     icon: Icon(Icons.person),
                     color: Colors.white,
                     onPressed: () {
-                      // Handle profile button tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
+                      );
                     },
                   ),
                   IconButton(
@@ -165,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'Selected Date:',
                             style: TextStyle(
-                              color: Colors.black26,
+                              color: Colors.green,
                               fontSize: 16,
                             ),
                           ),

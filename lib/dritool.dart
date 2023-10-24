@@ -30,7 +30,10 @@ class _DRIToolPageState extends State<DRIToolPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('DRI Calculator')),
+      appBar: AppBar(title:
+      Text('DRI Calculator',
+          style: TextStyle(color: Colors.white)),
+      backgroundColor: Colors.green,),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
