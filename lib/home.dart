@@ -26,9 +26,7 @@ class _HomePageState extends State<HomePage> {
   double kcalLeftValue = 0.0; // Initialize with actual values from DRI Tool
   double burnedValue = 0.0; // Initialize with actual values from DRI Tool
 
-
   DateTime selectedDate = DateTime.now();
-
 
   int filledGlasses = 0;
   static const int totalGlasses = 8;
@@ -37,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-  /*  NutritionPage(),
+    /*  NutritionPage(),
     RecipesPage(),
     ProfilePage(),
     SettingsPage(),*/
@@ -56,211 +54,248 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-
         child: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                  'images/back2.jpeg'), // Replace with your image asset
-              fit: BoxFit.cover,
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'images/back7.jpg'), // Replace with your image asset
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          child: Column(
-            children: <Widget>[
-              // First Row: App Name, Profile Icon, Notification Icon
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      'MealBuddy',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
+            child: Column(
+              children: <Widget>[
+                // First Row: App Name, Profile Icon, Notification Icon
+                Row(
+                  children: <Widget>[
+                    SizedBox(width: 8.0),
+                    Expanded(
+                      child: Text(
+                        'MealBuddy',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.person),
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProfilePage()),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.notifications),
-                    color: Colors.white,
-                    onPressed: () {
-                      // Handle notification button tap
-                    },
-                  ),
-                ],
-              ),
-
-              // Second Row: Eaten, Kcal Left, Burned (calculated from DRI Tool)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  CircleValue(
-                    label: 'Eaten',
-                    value: eatenValue,
-                  ),
-                  CircleValue(
-                    label: 'Kcal Left',
-                    value: kcalLeftValue,
-                  ),
-                  CircleValue(
-                    label: 'Burned',
-                    value: burnedValue,
-                  ),
-                ],
-              ),
-
-              // Fourth Row: Card for Carbs, Protein, Fat (Eaten and Left)
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
+                    IconButton(
+                      icon: Icon(Icons.person),
+                      color: Colors.white,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfilePage()),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.notifications),
+                      color: Colors.white,
+                      onPressed: () {
+                        // Handle notification button tap
+                      },
+                    ),
+                  ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      NutritionInfo(title: 'Carbs', value: '0 / 160g'),
-                      Divider(),
-                      NutritionInfo(title: 'Protein', value: '0 / 64g'),
-                      Divider(),
-                      NutritionInfo(title: 'Fat', value: '0 / 43g'),
-                    ],
-                  ),
-                ),
-              ),
 
-              // Fifth Row: Calendar Date (Separate Section)
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                // Second Row: Eaten, Kcal Left, Burned (calculated from DRI Tool)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    CircleValue(
+                      label: 'Eaten',
+                      value: eatenValue,
+                    ),
+                    CircleValue(
+                      label: 'Kcal Left',
+                      value: kcalLeftValue,
+                    ),
+                    CircleValue(
+                      label: 'Burned',
+                      value: burnedValue,
+                    ),
+                  ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Text(
-                            'Selected Date:',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16,
+
+                // Fifth Row: Calendar Date (Separate Section)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(Icons.calendar_today),
+                              color: Colors.white,
+                              onPressed: () {
+                                _selectDate(context);
+                              },
                             ),
-                          ),
-                          Text(
-                            '${selectedDate.toLocal()}'.split(' ')[0],
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.calendar_today),
-                            color: Colors.black26,
-                            onPressed: () {
-                              _selectDate(context);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Sixth Row: Water Section (Glasses of Water)
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Water', style: TextStyle(fontSize: 20)),
-                          Text('${filledGlasses * volumePerGlass}L', style: TextStyle(fontSize: 20)),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Wrap(
-                        spacing: 8,
-                        children: List.generate(totalGlasses, (index) {
-                          return GestureDetector(
-                            onTap: () {
-                              if (index == filledGlasses) {
-                                setState(() {
-                                  filledGlasses++;
-                                });
-                              }
-                            },
-                            child: Container(
-                              width: 30,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: index == filledGlasses
-                                    ? Text('+', style: TextStyle(fontSize: 20, color: Colors.white))
-                                    : Icon(Icons.local_drink, color: index < filledGlasses ? Colors.blue : Colors.blue[100]),
+                            Text(
+                              '${selectedDate.toLocal()}'.split(' ')[0],
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          );
-                        }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Fourth Row: Card for Carbs, Protein, Fat (Eaten and Left)
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        NutritionInfo(title: 'Carbs', value: '0 / 160g'),
+                        Divider(),
+                        NutritionInfo(title: 'Protein', value: '0 / 64g'),
+                        Divider(),
+                        NutritionInfo(title: 'Fat', value: '0 / 43g'),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Sixth Row: Water Section (Glasses of Water)
+                Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Water', style: TextStyle(fontSize: 20)),
+                            Text('${filledGlasses * volumePerGlass}L',
+                                style: TextStyle(fontSize: 20)),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Wrap(
+                          spacing: 8,
+                          children: List.generate(totalGlasses, (index) {
+                            return GestureDetector(
+                              onTap: () {
+                                if (index == filledGlasses) {
+                                  setState(() {
+                                    filledGlasses++;
+                                  });
+                                }
+                              },
+                              child: Container(
+                                width: 30,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: index == filledGlasses
+                                      ? Text('+',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white))
+                                      : Icon(Icons.local_drink,
+                                          color: index < filledGlasses
+                                              ? Colors.blueAccent
+                                              : Colors.redAccent),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Seventh Row: Meal Cards (Breakfast, Lunch, Snacks, Dinner with Kcal calculation)
+                Card(
+                  elevation: 5.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      MealCard(
+                        title: 'Breakfast',
+                        imageUrl: 'images/breakfast.png',
+                        calorieRange: 'Recommended 255 - 383 kcal',
+                      ),
+                      Divider(),
+                      MealCard(
+                        title: 'Lunch',
+                        imageUrl: 'images/lunchbox.png',
+                        calorieRange: 'Recommended 383 - 510 kcal',
+                      ),
+                      Divider(),
+                      MealCard(
+                        title: 'Dinner',
+                        imageUrl: 'images/meal.png',
+                        calorieRange: 'Recommended 383 - 510 kcal',
+                      ),
+                      Divider(),
+                      MealCard(
+                        title: 'Snacks',
+                        imageUrl: 'images/snacks.png',
+                        calorieRange: 'Recommended 64 - 128 kcal',
                       ),
                     ],
                   ),
                 ),
-              ),
-
-              // Seventh Row: Meal Cards (Breakfast, Lunch, Snacks, Dinner with Kcal calculation)
-              MealCard(
-                title: 'Breakfast',
-                imageUrl: 'images/breakfast.png',
-                calorieRange: 'Recommended 255 - 383 kcal',
-              ),
-              SizedBox(height: 10),
-              MealCard(
-                title: 'Lunch',
-                imageUrl: 'images/lunchbox.png',
-                calorieRange: 'Recommended 383 - 510 kcal',
-              ),
-              SizedBox(height: 10),
-              MealCard(
-                title: 'Dinner',
-                imageUrl: 'images/meal.png',
-                calorieRange: 'Recommended 383 - 510 kcal',
-              ),
-              SizedBox(height: 10),
-              MealCard(
-                title: 'Snacks',
-                imageUrl: 'images/snacks.png',
-                calorieRange: 'Recommended 64 - 128 kcal',
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.green,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt_outlined),
+            label: 'Progress',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star_border),
+            label: 'Premium',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Recipes',
+          ),
+        ],
       ),
     );
   }
@@ -306,7 +341,8 @@ class CircleValue extends StatelessWidget {
                 ),
               ),
               Positioned(
-                bottom: 2.5, // Adjust this value to control label's vertical positioning
+                bottom:
+                    2.5, // Adjust this value to control label's vertical positioning
                 left: 0,
                 right: 0,
                 child: Text(
@@ -339,7 +375,7 @@ class NutritionInfo extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.green),
         ),
         Text(
           value,
@@ -355,32 +391,30 @@ class MealCard extends StatelessWidget {
   final String imageUrl;
   final String calorieRange;
 
-  MealCard({required this.title, required this.imageUrl, required this.calorieRange});
+  MealCard({
+    required this.title,
+    required this.imageUrl,
+    required this.calorieRange,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+    return ListTile(
+      leading: Image.asset(
+        imageUrl, // replace with your image paths
+        width: 50.0,
+        height: 50.0,
+        fit: BoxFit.cover,
       ),
-      child: ListTile(
-        leading: Image.asset(
-          imageUrl, // replace with your image paths
-          width: 50.0,
-          height: 50.0,
-          fit: BoxFit.cover,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        subtitle: Text(
-          calorieRange,
-          style: TextStyle(color: Colors.grey),
-        ),
-        trailing: Icon(Icons.add, color: Colors.grey),
+      title: Text(
+        title,
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
+      subtitle: Text(
+        calorieRange,
+        style: TextStyle(color: Colors.grey),
+      ),
+      trailing: Icon(Icons.add, color: Colors.grey),
     );
   }
 }
