@@ -24,6 +24,8 @@ class _RegisterState extends State<Register> {
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
