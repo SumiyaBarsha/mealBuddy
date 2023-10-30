@@ -1,19 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'DRI Calculator',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: DRIToolPage(),
-    );
-  }
-}
 
 class DRIToolPage extends StatefulWidget {
   @override
@@ -21,11 +8,37 @@ class DRIToolPage extends StatefulWidget {
 }
 
 class _DRIToolPageState extends State<DRIToolPage> {
+
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+
   String? _selectedGender;
   String? _selectedActivityLevel;
-  TextEditingController _ageController = TextEditingController();
-  TextEditingController _heightController = TextEditingController();
-  TextEditingController _weightController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+
+  double? _estimatedCalories;
+  double? _fat;
+  double? _carbohydrate;
+  double? _protein;
+
+  void _calculateValues() {
+    double age = double.tryParse(_ageController.text) ?? 0;
+    double height = double.tryParse(_heightController.text) ?? 0;
+    double weight = double.tryParse(_weightController.text) ?? 0;
+
+    double calculatedCalories = weight * 15;
+    double calculatedFat = calculatedCalories * 0.3;
+    double calculatedCarbohydrate = calculatedCalories * 0.5;
+    double calculatedProtein = weight * 0.8;
+
+    setState(() {
+      _estimatedCalories = calculatedCalories; // Replace with your calculation result.
+      _fat = calculatedFat; // Replace with your calculation result.
+      _carbohydrate = calculatedCarbohydrate; // Replace with your calculation result.
+      _protein = calculatedProtein; // Replace with your calculation result.
+    }); // Rebuild the widget to show updated values
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +119,29 @@ class _DRIToolPageState extends State<DRIToolPage> {
               ),
               SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  // Implement the logic to calculate values using DRI tool here.
+                onPressed: ()  {
+                _calculateValues();
+
+                  // Set the calculated data in the "DRI" child of your database
+                _dbRef.child("DRI").set( {
+                  'calorie': _estimatedCalories,
+                  'fat': _fat,
+                  'carbs': _carbohydrate,
+                  'protein': _protein,
+                }).then((_) {
+                  print('Data saved');
+                }).catchError((error) {
+                  print('Error: $error');
+                });
                 },
                 child: Text('Calculate'),
               ),
+              SizedBox(height: 24),
+              if (_estimatedCalories != null)
+                Text('Estimated Calorie/Day: $_estimatedCalories kcal'),
+              if (_fat != null) Text('Fat: $_fat g'),
+              if (_carbohydrate != null) Text('Carbohydrate: $_carbohydrate g'),
+              if (_protein != null) Text('Protein: $_protein g'),
             ],
           ),
         ),

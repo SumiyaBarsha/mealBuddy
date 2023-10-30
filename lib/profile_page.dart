@@ -95,7 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       SizedBox(width: 16),
                       Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "Sumiya",
@@ -127,10 +127,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: Text('Personal details'),
                       trailing: Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
-                       Navigator.push(
-                         context,
-                         MaterialPageRoute(builder: (context) => personalDetail()),
-                       );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => personalDetail()),
+                        );
                       },
                     ),
                     Divider(thickness: 1, color: Colors.grey[300]), // Divider for differentiation

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/profile_page.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import 'dritool.dart';
 
@@ -22,6 +23,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.reference().child("DRI");
+
   double eatenValue = 0.0; // Initialize with actual values from DRI Tool
   double kcalLeftValue = 0.0; // Initialize with actual values from DRI Tool
   double burnedValue = 0.0; // Initialize with actual values from DRI Tool
@@ -54,6 +58,44 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
+  String? _carbsValue = '';
+  String? _proteinValue = '';
+  String? _fatValue = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromDatabase();
+  }
+
+  void fetchDataFromDatabase() {
+    _dbRef.child("DRI").onValue.listen((event) {
+      final data = event.snapshot.value;
+
+      if (data != null && data is Map) {
+        if (data['carbs'] != null) {
+          setState(() {
+            _carbsValue = '0/${data['carbs'].toStringAsFixed(2)} g';
+          });
+        }
+
+        if (data['protein'] != null) {
+          setState(() {
+            _proteinValue = '0/ ${data['protein'].toStringAsFixed(2)} g';
+          });
+        }
+
+        if (data['fat'] != null) {
+          setState(() {
+            _fatValue = ' 0/${data['fat'].toStringAsFixed(2)} g';
+          });
+        }
+      }
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -164,11 +206,11 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        NutritionInfo(title: 'Carbs', value: '0 / 160g'),
+                        NutritionInfo(title: 'Carbs', value: _carbsValue ?? ''),
                         Divider(),
-                        NutritionInfo(title: 'Protein', value: '0 / 64g'),
+                        NutritionInfo(title: 'Protein', value: _proteinValue ?? ''),
                         Divider(),
-                        NutritionInfo(title: 'Fat', value: '0 / 43g'),
+                        NutritionInfo(title: 'Fat', value: _fatValue ?? ''),
                       ],
                     ),
                   ),
@@ -300,6 +342,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 
 class CircleValue extends StatelessWidget {
   final String label;
