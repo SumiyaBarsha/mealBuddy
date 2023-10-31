@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/actvitylevel.dart';
+import 'package:meal_recommender/profile_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -68,20 +69,20 @@ class _personalDetailState extends State<personalDetail> {
               child: Column(
                 children: [
                   ListTile(
-                    title: Text('First name'),
-                    trailing: Text((savedText ?? 'Your Name') + ' >'),
+                    title: Text('Name'),
+                    trailing: Text((name ?? 'Your Name') + ' >'),
                     onTap: () => _showDialog(context, 'First name'),
                   ),
                   Divider(),
                   ListTile(
                     title: Text('Current weight'),
-                    trailing: Text((savedWeight?? 'Select Weight')+ '>'),
+                    trailing: Text((weight ?? 'Select Weight')+ ' Kg >'),
                     onTap: () => _showDialog(context, 'Weight in kg'),
                   ),
                   Divider(),
                   ListTile(
                     title: Text('Height'),
-                    trailing: Text((savedHeight ?? 'Select Height')+'>'),
+                    trailing: Text((height ?? 'Select Height')+' cm >'),
                     onTap: () => _showDialog(context, 'Height in cm'),
                   ),
                   Divider(),

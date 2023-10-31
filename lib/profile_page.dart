@@ -4,6 +4,8 @@ import 'package:meal_recommender/dietneedsPage.dart';
 import 'package:meal_recommender/dritool.dart';
 import 'package:meal_recommender/login.dart';
 import 'package:meal_recommender/personalDetail.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 void main() => runApp(MyApp());
 
@@ -22,9 +24,72 @@ class ProfilePage extends StatefulWidget {
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
+class RowData extends StatelessWidget {
+  final String title;
+  final String value;
 
+  const RowData({required this.title, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(fontSize: 16)),
+          Text(value, style: TextStyle(fontSize: 16)),
+        ],
+      ),
+    );
+  }
+}
+
+String? name,height,weight,age,goal,diet;
 class _ProfilePageState extends State<ProfilePage> {
   @override
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+
+  void fetchUserData() async {
+
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      String userId = user.uid;
+
+      DatabaseReference userRef = _database.reference().child('Users').child(userId);
+
+      try {
+        DatabaseEvent event = await userRef.once();
+        DataSnapshot dataSnapshot = event.snapshot;
+        // You can access the data using dataSnapshot.value
+        if (dataSnapshot.value != null) {
+          Map<dynamic, dynamic> userData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+          name = userData['name'];
+          height = userData['height'];
+          weight = userData['weight'];
+          // Access other user information as needed
+          print("Name: $name");
+          print("height: $height");
+          print("weight: $weight");
+        } else {
+          print("User data not found.");
+        }
+      } catch (error) {
+        print("Error fetching user data: $error");
+      }
+    } else {
+      print("No user is signed in.");
+    }
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -70,44 +135,54 @@ class _ProfilePageState extends State<ProfilePage> {
               margin: EdgeInsets.all(16.0),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: Row(
-                    children: [
-                      Stack(
-                        alignment: AlignmentDirectional.bottomEnd,
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey[200],
-                            // Background image for the profile can be added here.
-                          ),
-                          Positioned(
-                            bottom: -10,  // adjust this value to move the icon up or down
-                            child: IconButton(
-                              icon: Icon(Icons.add_a_photo),
-                              color: Colors.green,
-                              onPressed: () {
-                                // Handle notification button tap
-                              },
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Stack(
+                          alignment: AlignmentDirectional.bottomEnd,
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey[200],
+                              // Background image for the profile can be added here.
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 16),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Sumiya",
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text("23 years old"),
-                          SizedBox(height: 8),
-                        ],
-                      ),
-                    ],
-                  ),
+
+                            Positioned(
+                              bottom: -10,
+                              child: IconButton(
+                                icon: Icon(Icons.add),
+                                color: Colors.green,
+                                onPressed: () {
+                                  // Handle profile image edit button tap
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name ?? "Name",
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                                age ?? "-- years old"
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Divider(thickness: 2, color: Colors.grey[300]), // Divider for differentiation
+                    SizedBox(height: 8),
+                    RowData(title: "Current weight", value: (weight ?? "55")+" Kg"),
+                    RowData(title: "Goal", value: goal ?? "Maintain weight"),
+                    RowData(title: "Active Diet", value: diet ?? "Standard"),
+                  ],
                 ),
               ),
             ),

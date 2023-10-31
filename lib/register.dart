@@ -217,6 +217,7 @@ class _RegisterState extends State<Register> {
                   'email': emailController.text,
                   'height': heightController.text,
                   'weight': weightController.text,
+                  'dob': DateTime(1990, 1, 1),
                 });
                 await showDialog(
                   context: context,
