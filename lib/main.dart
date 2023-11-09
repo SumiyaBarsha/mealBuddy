@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:meal_recommender/firebase_api.dart';
 import 'package:meal_recommender/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -12,7 +11,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
 
   );
-  await FirebaseAPI().initNotifications();
   runApp(MyApp());
 
 

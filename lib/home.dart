@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:meal_recommender/BMIcalc.dart';
-import 'package:meal_recommender/fixedDiet.dart';
-import 'package:meal_recommender/notificationpage.dart';
 import 'package:meal_recommender/profile_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import 'dritool.dart';
+
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -21,9 +23,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final DatabaseReference _dbRef =
-  FirebaseDatabase.instance.ref().child("DRI");
 
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.reference().child("DRI");
 
   double eatenValue = 0.0; // Initialize with actual values from DRI Tool
   double kcalLeftValue = 0.0; // Initialize with actual values from DRI Tool
@@ -94,6 +95,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,11 +141,7 @@ class _HomePageState extends State<HomePage> {
                       icon: Icon(Icons.notifications),
                       color: Colors.white,
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NotificationPage()),
-                        );
+                        // Handle notification button tap
                       },
                     ),
                   ],
@@ -209,8 +208,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         NutritionInfo(title: 'Carbs', value: _carbsValue ?? ''),
                         Divider(),
-                        NutritionInfo(
-                            title: 'Protein', value: _proteinValue ?? ''),
+                        NutritionInfo(title: 'Protein', value: _proteinValue ?? ''),
                         Divider(),
                         NutritionInfo(title: 'Fat', value: _fatValue ?? ''),
                       ],
@@ -324,75 +322,27 @@ class _HomePageState extends State<HomePage> {
         },
         items: [
           BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-              },
-              child: Icon(Icons.home_outlined),
-            ),
+            icon: Icon(Icons.home_outlined),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BMICalculatorPage() ),
-                );
-              },
-              child: Icon(Icons.calculate_outlined),
-            ),
-            label: 'Health Monitor',
-          ),
-          BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DietPlanPage() ),
-                );
-              },
-              child: Icon(Icons.list_alt_outlined),
-            ),
+            icon: Icon(Icons.list_alt_outlined),
             label: 'Progress',
           ),
           BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DietPlanPage() ),
-                );
-              },
-              child: Icon(Icons.star_border),
-            ),
+            icon: Icon(Icons.star_border),
             label: 'Premium',
           ),
           BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DietPlanPage()),
-                );
-              },
-              child: Icon(Icons.restaurant_menu),
-            ),
+            icon: Icon(Icons.restaurant_menu),
             label: 'Recipes',
           ),
         ],
       ),
     );
   }
-
-
 }
+
 
 class CircleValue extends StatelessWidget {
   final String label;
@@ -468,8 +418,7 @@ class NutritionInfo extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.green),
         ),
         Text(
           value,
