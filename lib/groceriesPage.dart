@@ -57,18 +57,11 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grocery List'),
+        title: Text('Grocery List',style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.green,
       ),
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("images/groceries.jpg"), // Make sure you have an images folder in your assets directory
-                fit: BoxFit.cover, // This will fill the background with the image
-              ),
-            ),
-          ),
           ListView.builder(
             itemCount: _groceryItems.length,
             itemBuilder: (context, index) {
@@ -94,8 +87,8 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
         onPressed: () {
           _navigateAndDisplaySelection(context);
         },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
+        child: Icon(Icons.add,color: Colors.white,),
+        backgroundColor: Colors.green,
       ),
     );
   }
@@ -205,7 +198,8 @@ class SelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Items'),
+        title: Text('Select Items',style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.green,
       ),
       body: ListView(
         children: <Widget>[

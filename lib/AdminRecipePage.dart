@@ -80,7 +80,8 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Recipe Upload'),
+        title: Text('Admin Recipe Upload',style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.green,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -90,11 +91,19 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
                 ? Image.file(File(_image!.path))
                 : Placeholder(fallbackHeight: 200, fallbackWidth: double.infinity),
             ElevatedButton(
-              child: Text('Choose Image'),
+              child: Text('Choose Image',style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green, // background
+                onPrimary: Colors.green,
+              ),
               onPressed: chooseFile,
             ),
             ElevatedButton(
-              child: Text('Upload Image'),
+              child: Text('Upload Image',style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green, // background
+                onPrimary: Colors.green,
+              ),
               onPressed: uploadFile,
             ),
             TextFormField(
@@ -117,9 +126,14 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
               decoration: InputDecoration(labelText: 'Recipe Description'),
             ),
             ElevatedButton(
-              child: Text('Add Recipe'),
+              child: Text('Add Recipe',style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green, // background
+                onPrimary: Colors.green,
+              ),
               onPressed: addRecipe,
             ),
+            SizedBox(height: 20.00,)
           ],
         ),
       ),

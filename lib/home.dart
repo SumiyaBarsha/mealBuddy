@@ -5,7 +5,48 @@ import 'package:meal_recommender/notificationpage.dart';
 import 'package:meal_recommender/profile_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:meal_recommender/groceriesPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import 'AdminRecipePage.dart';
+
+class AuthService {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
+
+  // Method to sign in a user using email and password
+  Future<UserCredential?> signIn(String email, String password) async {
+    try {
+      return await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
+    } catch (e) {
+      // Handle exceptions, e.g., wrong password
+      print(e);
+      return null;
+    }
+  }
+
+  Future<void> signOut() async {
+    return _firebaseAuth.signOut();
+  }
+
+// Method to check if the currently signed-in user is an admin
+  Future<bool> checkIfUserIsAdmin() async {
+    User? currentUser = _firebaseAuth.currentUser;
+
+    if (currentUser != null) {
+      DataSnapshot userSnapshot = await _database.reference().child('admins').child(currentUser.uid).get();
+
+      // Check if the snapshot value is a map and contains the isAdmin key
+      if (userSnapshot.value is Map<String, dynamic>) {
+        Map<String, dynamic> userData = userSnapshot.value as Map<String, dynamic>;
+        return userData['isAdmin'] ?? false; // This assumes 'isAdmin' is a boolean field in your database
+      }
+    }
+
+    return false; // Return false if currentUser is null or userData is not a Map
+  }
+
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -38,6 +79,22 @@ class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
 
+  bool isAdmin = true;
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromDatabase();
+    _checkAdminStatus();
+  }
+
+  Future<void> _checkAdminStatus() async {
+    AuthService authService = AuthService();
+    bool isAdmin = await authService.checkIfUserIsAdmin();
+    setState(() {
+      isAdmin = isAdmin;
+    });
+  }
+
   final List<Widget> _pages = [
     /*  NutritionPage(),
     RecipesPage(),
@@ -62,12 +119,6 @@ class _HomePageState extends State<HomePage> {
   String? _carbsValue = '';
   String? _proteinValue = '';
   String? _fatValue = '';
-
-  @override
-  void initState() {
-    super.initState();
-    fetchDataFromDatabase();
-  }
 
   void fetchDataFromDatabase() {
     _dbRef.child("DRI").onValue.listen((event) {
@@ -319,10 +370,11 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.green,
         currentIndex: _currentIndex,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+
+            setState(() {
+              _currentIndex = index;
+            });
+          },
         items: [
           BottomNavigationBarItem(
             icon: GestureDetector(
@@ -371,9 +423,9 @@ class _HomePageState extends State<HomePage> {
                       builder: (context) => MyGroceryPage() ),
                 );
               },
-              child: Icon(Icons.star_border),
+              child: Icon(Icons.shopping_basket_outlined),
             ),
-            label: 'Premium',
+            label: 'Groceries',
           ),
           BottomNavigationBarItem(
             icon: GestureDetector(
@@ -387,6 +439,19 @@ class _HomePageState extends State<HomePage> {
             ),
             label: 'Recipes',
           ),
+          if (isAdmin)
+            BottomNavigationBarItem(
+              icon: GestureDetector(
+                onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AdminRecipePage()),
+                    );
+                },
+              child: Icon(Icons.add),
+              ),
+              label: 'Add',
+            ),
         ],
       ),
     );
