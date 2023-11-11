@@ -21,9 +21,9 @@ class _DietPlanPage extends State<DietPlanPage> {
       appBar: AppBar(
         backgroundColor: Colors.green,
         title: Text('MealBuddy',
-        style: TextStyle(
-          color: Colors.white,
-        ),
+          style: TextStyle(
+            color: Colors.white,
+          ),
         ),
       ),
       body: ListView(
@@ -32,11 +32,11 @@ class _DietPlanPage extends State<DietPlanPage> {
           Padding(
             padding: EdgeInsets.all(16.0),
             child: Text('Choose your perfect diet plan',
-            style: TextStyle(
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
-              fontSize: 16.00,
-            ),
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+                fontSize: 16.00,
+              ),
             ),
           ),
           // Horizontally scrollable cards
@@ -123,37 +123,36 @@ class _DietPlanPage extends State<DietPlanPage> {
 
   Widget buildCard(String imageUrl, String title, String subtitle) {
     return InkWell(
-        onTap: () {
-      // Handle the tap, navigate to a new screen or display a message
-      print('Card tapped!');
-    },
-    child: Card(
-      margin: EdgeInsets.all(8.0),
-      child: Container(
-        width: 160, // Adjust the width to fit your design
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Image.network(
-              imageUrl,
-              height: 120, // Adjust the height to fit your design
-              width: 160,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(subtitle),
-            ),
-          ],
+      onTap: () {
+        // Handle the tap, navigate to a new screen or display a message
+        print('Card tapped!');
+      },
+      child: Card(
+        margin: EdgeInsets.all(8.0),
+        child: Container(
+          width: 160, // Adjust the width to fit your design
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Image.network(
+                imageUrl,
+                height: 120, // Adjust the height to fit your design
+                width: 160,
+                fit: BoxFit.cover,
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(subtitle),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
-
 

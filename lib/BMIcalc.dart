@@ -47,9 +47,9 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('BMI Calculator',
-        style: TextStyle(
-          color: Colors.white,
-        ),
+          style: TextStyle(
+            color: Colors.white,
+          ),
         ),
         backgroundColor: Colors.green,
       ),
@@ -95,7 +95,7 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
               ElevatedButton(
                 onPressed: _calculateBMI,
                 child: Text('Calculate BMI',style: TextStyle(
-                    color: Colors.white,
+                  color: Colors.white,
                 ),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -105,32 +105,32 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
                 ),
               ),
               SizedBox(height: 20),
-          Visibility(
-            visible: _bmiResult.isNotEmpty,
-            child: Column(
-              children: [
-                Text(
-                  _bmiResult.split('\n').first, // Splitting the result to show the BMI value on a separate line
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+              Visibility(
+                visible: _bmiResult.isNotEmpty,
+                child: Column(
+                  children: [
+                    Text(
+                      _bmiResult.split('\n').first, // Splitting the result to show the BMI value on a separate line
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      _bmiResult.split('\n').last, // Splitting the result to show the health assessment on a separate line
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: _getColor(_bmiResult), // We'll create this method below
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8),
-                Text(
-                  _bmiResult.split('\n').last, // Splitting the result to show the health assessment on a separate line
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: _getColor(_bmiResult), // We'll create this method below
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
             ],
           ),
         ),

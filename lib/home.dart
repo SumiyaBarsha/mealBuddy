@@ -257,13 +257,13 @@ class _HomePageState extends State<HomePage> {
                                 child: Center(
                                   child: index == filledGlasses
                                       ? Text('+',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white))
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white))
                                       : Icon(Icons.local_drink,
-                                          color: index < filledGlasses
-                                              ? Colors.blueAccent
-                                              : Colors.redAccent),
+                                      color: index < filledGlasses
+                                          ? Colors.blueAccent
+                                          : Colors.redAccent),
                                 ),
                               ),
                             );
@@ -435,7 +435,7 @@ class CircleValue extends StatelessWidget {
               ),
               Positioned(
                 bottom:
-                    2.5, // Adjust this value to control label's vertical positioning
+                2.5, // Adjust this value to control label's vertical positioning
                 left: 0,
                 right: 0,
                 child: Text(
