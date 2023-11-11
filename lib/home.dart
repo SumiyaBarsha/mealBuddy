@@ -6,6 +6,7 @@ import 'package:meal_recommender/profile_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:meal_recommender/groceriesPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:meal_recommender/recipes.dart';
 
 import 'AdminRecipePage.dart';
 
@@ -432,7 +433,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DietPlanPage()),
+                  MaterialPageRoute(builder: (context) => RecipesPage()),
                 );
               },
               child: Icon(Icons.restaurant_menu),

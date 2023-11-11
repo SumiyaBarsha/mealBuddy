@@ -18,6 +18,7 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
   TextEditingController _proteinController = TextEditingController();
   TextEditingController _fatController = TextEditingController();
   TextEditingController _recipeController = TextEditingController();
+  TextEditingController _titleController = TextEditingController();
 
   @override
   void dispose() {
@@ -25,6 +26,7 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
     _proteinController.dispose();
     _fatController.dispose();
     _recipeController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -56,14 +58,16 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
   }
 
   Future addRecipe() async {
-    if (_uploadedFileURL == null) {
+    if (_uploadedFileURL == null || selectedMealType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please upload an image first")),
+        SnackBar(content: Text("Please upload an image and select a meal type")),
       );
       return;
     }
     DatabaseReference dbRef = FirebaseDatabase.instance.ref('recipes').push();
     await dbRef.set({
+      'title': _titleController.text,
+      'mealType': selectedMealType,
       'carbs': _carbsController.text,
       'protein': _proteinController.text,
       'fat': _fatController.text,
@@ -76,65 +80,126 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
   }
 
 
+
+  List<String> mealTypes = ['breakfast', 'lunch', 'dinner'];
+  String? selectedMealType;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Recipe Upload',style: TextStyle(color: Colors.white),),
+        title: Text(
+          'Admin Recipe Upload',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.green,
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0), // Added padding to the sides
         child: Column(
           children: <Widget>[
             SizedBox(height: 20),
             _image != null
-                ? Image.file(File(_image!.path))
-                : Placeholder(fallbackHeight: 200, fallbackWidth: double.infinity),
+                ? Image.file(
+              File(_image!.path),
+              width: double.infinity,
+              // Set image width to match the screen width
+              height: 200,
+              // Fixed height for the image
+              fit: BoxFit.cover, // Cover the entire widget area
+            )
+                : Placeholder(
+                fallbackHeight: 200, fallbackWidth: double.infinity),
+            SizedBox(height: 20), // Added some space before the button
             ElevatedButton(
-              child: Text('Choose Image',style: TextStyle(color: Colors.white),),
+              child: Text(
+                  'Choose Image', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green, // background
-                onPrimary: Colors.green,
+                onPrimary: Colors.white, // text color
               ),
               onPressed: chooseFile,
             ),
+            SizedBox(height: 10), // Added some space between buttons
             ElevatedButton(
-              child: Text('Upload Image',style: TextStyle(color: Colors.white),),
+              child: Text(
+                  'Upload Image', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green, // background
-                onPrimary: Colors.green,
+                onPrimary: Colors.white, // text color
               ),
               onPressed: uploadFile,
             ),
-            TextFormField(
-              controller: _carbsController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Carbohydrates (g)'),
+            SizedBox(height: 20), // Added some space before the form fields
+            DropdownButtonFormField<String>(
+              value: selectedMealType,
+              hint: Text('Select Meal Type'),
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              items: mealTypes.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedMealType = newValue;
+                });
+              },
             ),
-            TextFormField(
-              controller: _proteinController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Protein (g)'),
+            SizedBox(height: 10),
+            buildTextFormField(
+                _titleController, // Use the new controller here
+                'Title', // Label text for the new field
+                TextInputType.text // Set the keyboard type to text
             ),
-            TextFormField(
-              controller: _fatController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Fat (g)'),
-            ),
-            TextFormField(
-              controller: _recipeController,
-              decoration: InputDecoration(labelText: 'Recipe Description'),
-            ),
+            buildTextFormField(
+                _carbsController, 'Carbohydrates (g)', TextInputType.number),
+            buildTextFormField(
+                _proteinController, 'Protein (g)', TextInputType.number),
+            buildTextFormField(_fatController, 'Fat (g)', TextInputType.number),
+            buildTextFormField(
+                _recipeController, 'Recipe Description', TextInputType.text),
+            SizedBox(height: 20), // Added some space before the button
             ElevatedButton(
-              child: Text('Add Recipe',style: TextStyle(color: Colors.white),),
+              child: Text('Add Recipe', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green, // background
-                onPrimary: Colors.green,
+                onPrimary: Colors.white, // text color
               ),
               onPressed: addRecipe,
             ),
-            SizedBox(height: 20.00,)
+            SizedBox(height: 20), // Added space at the bottom
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextFormField(TextEditingController controller, String label,
+      TextInputType keyboardType) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        // Added padding inside the text field
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(
+              10.0), // Rounded corners for the input border
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.green, width: 1.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.green, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
         ),
       ),
     );
