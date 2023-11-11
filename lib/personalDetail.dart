@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:meal_recommender/actvitylevel.dart';
 import 'package:meal_recommender/profile_page.dart';
 
-void main() => runApp(MyApp());
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
