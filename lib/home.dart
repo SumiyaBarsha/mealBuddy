@@ -4,6 +4,7 @@ import 'package:meal_recommender/fixedDiet.dart';
 import 'package:meal_recommender/notificationpage.dart';
 import 'package:meal_recommender/profile_page.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:meal_recommender/groceriesPage.dart';
 
 
 class MyApp extends StatelessWidget {
@@ -367,7 +368,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DietPlanPage() ),
+                      builder: (context) => MyGroceryPage() ),
                 );
               },
               child: Icon(Icons.star_border),
