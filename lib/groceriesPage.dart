@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 void main() {
   runApp(MyGroceryApp());
@@ -45,6 +48,8 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
       setState(() {
         _groceryItems.add(result);
       });
+      // After adding to the local list, also upload to Firebase
+      _uploadGroceryItem(result);
     }
   }
 
@@ -54,16 +59,37 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
       appBar: AppBar(
         title: Text('Grocery List'),
       ),
-      body:ListView.builder(
-        itemCount: _groceryItems.length,
-        itemBuilder: (context, index) {
-          final item = _groceryItems[index];
-          return ListTile(
-            title: Text('${item.name} - ${item.amount.toStringAsFixed(2)} ${item.unit}'),
-          );
-        },
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/groceries.jpg"), // Make sure you have an images folder in your assets directory
+                fit: BoxFit.cover, // This will fill the background with the image
+              ),
+            ),
+          ),
+          ListView.builder(
+            itemCount: _groceryItems.length,
+            itemBuilder: (context, index) {
+              final item = _groceryItems[index];
+              return Card(
+                elevation: 3, // Add some elevation for a card-like effect
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Add margin for spacing
+                child: ListTile(
+                  title: Text(
+                    '${item.name} - ${item.amount.toStringAsFixed(2)} ${item.unit}',
+                    style: TextStyle(
+                      fontSize: 18, // Adjust the font size as needed
+                      fontWeight: FontWeight.bold, // Add bold for emphasis
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _navigateAndDisplaySelection(context);
@@ -74,6 +100,28 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
     );
   }
 }
+
+Future<void> _uploadGroceryItem(GroceryItem item) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+    DatabaseReference itemsRef = FirebaseDatabase.instance.reference().child('Users').child(userId).child('GroceryItems');
+
+    // Create a unique key for a new grocery item. If `push().key` is null, an error will be thrown.
+    String itemKey = itemsRef.push().key ?? 'default-key'; // Add a default key or handle null as needed
+
+    // Set the data at the new location
+    await itemsRef.child(itemKey).set({
+      'name': item.name,
+      'amount': item.amount,
+      'unit': item.unit,
+    }).catchError((error) {
+      print("Failed to add item: $error");
+    });
+  }
+}
+
+
 
 Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) async {
   final TextEditingController amountController = TextEditingController();

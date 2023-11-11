@@ -81,6 +81,10 @@ class _ProfilePageState extends State<ProfilePage> {
           name = userData['name'];
           height = userData['height'];
           weight = userData['weight'];
+          setState(() {
+            _profileImageUrl = userData['profileImageUrl'];
+          });
+
           // Access other user information as needed
           print("Name: $name");
           print("height: $height");
@@ -189,8 +193,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.grey[200],
-                              backgroundImage: _profileImageUrl != null ? NetworkImage(_profileImageUrl!) : null, // Use the state variable here
-                              // Background image for the profile can be added here.
+                              backgroundImage: _profileImageUrl != null ? NetworkImage(_profileImageUrl!) : null,
                             ),
 
                             Positioned(
