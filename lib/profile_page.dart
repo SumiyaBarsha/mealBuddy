@@ -6,6 +6,12 @@ import 'package:meal_recommender/login.dart';
 import 'package:meal_recommender/personalDetail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
+
+
+
 
 void main() => runApp(MyApp());
 
@@ -47,6 +53,7 @@ class RowData extends StatelessWidget {
 
 String? name,height,weight,age,goal,diet;
 class _ProfilePageState extends State<ProfilePage> {
+  String? _profileImageUrl;
   @override
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -76,6 +83,10 @@ class _ProfilePageState extends State<ProfilePage> {
           name = userData['name'];
           height = userData['height'];
           weight = userData['weight'];
+          setState(() {
+            _profileImageUrl = userData['profileImageUrl'];
+          });
+
           // Access other user information as needed
           print("Name: $name");
           print("height: $height");
@@ -90,6 +101,44 @@ class _ProfilePageState extends State<ProfilePage> {
       print("No user is signed in.");
     }
   }
+
+  Future<void> _editProfileImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // Upload to Firebase Storage
+      try {
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('userProfileImages')
+            .child(_auth.currentUser!.uid + '.jpg');
+
+        await ref.putFile(imageFile);
+
+        // Get the download URL
+        final url = await ref.getDownloadURL();
+
+        // Update the profile image URL in the database
+        await _database.reference().child('Users').child(_auth.currentUser!.uid).update({
+          'profileImageUrl': url,
+        });
+
+        setState(() {
+          _profileImageUrl = url;
+        });
+
+      } catch (error) {
+        print('Error uploading profile image: $error');
+      }
+    } else {
+      print('No image selected.');
+    }
+  }
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -146,16 +195,16 @@ class _ProfilePageState extends State<ProfilePage> {
                             CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.grey[200],
-                              // Background image for the profile can be added here.
+                              backgroundImage: _profileImageUrl != null ? NetworkImage(_profileImageUrl!) : null,
                             ),
 
                             Positioned(
                               bottom: -10,
                               child: IconButton(
-                                icon: Icon(Icons.add),
+                                icon: Icon(Icons.add_a_photo), // Changed icon for better context
                                 color: Colors.green,
-                                onPressed: () {
-                                  // Handle profile image edit button tap
+                                onPressed: () async { // Make this an async function
+                                  await _editProfileImage(); // Wait for the edit profile image process to complete
                                 },
                               ),
                             ),
