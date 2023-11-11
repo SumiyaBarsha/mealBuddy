@@ -37,6 +37,43 @@ class GroceryItem {
 
 class _MyGroceryPageState extends State<MyGroceryPage> {
   List<GroceryItem> _groceryItems = [];
+  DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child('Users'); // Adjust the reference path as needed
+  @override
+  void initState() {
+    super.initState();
+    // Call the function to fetch data when the page is opened
+    _fetchGroceryItems();
+  }
+  // Function to fetch grocery items from Firebase
+  void _fetchGroceryItems() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      DatabaseReference itemsRef =
+      _databaseReference.child(userId).child('GroceryItems');
+
+      itemsRef.once().then((DatabaseEvent event) {
+        if (event.snapshot.exists) {
+          final values = event.snapshot.value as Map<dynamic, dynamic>;
+          _groceryItems.clear(); // Clear the list before adding new items
+
+          values.forEach((key, value) {
+            // Parse the data and add to the list
+            _groceryItems.add(GroceryItem(
+              value['name'],
+              value['amount']?.toDouble() ?? 0.0,
+              value['unit'],
+            ));
+          });
+
+          setState(() {}); // Update the UI after fetching data
+        }
+      }).catchError((error) {
+        print("Failed to fetch items: $error");
+      });
+
+    }
+  }
 
   void _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.push(
@@ -46,10 +83,9 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
 
     if (result != null) {
       setState(() {
-        _groceryItems.add(result);
+        _uploadGroceryItem(result); // This will update the Firebase database
+        _fetchGroceryItems();
       });
-      // After adding to the local list, also upload to Firebase
-      _uploadGroceryItem(result);
     }
   }
 
@@ -57,24 +93,31 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grocery List',style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.green,
+        title: Text('Grocery List'),
       ),
       body: Stack(
         children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/groceries.jpg"),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           ListView.builder(
             itemCount: _groceryItems.length,
             itemBuilder: (context, index) {
               final item = _groceryItems[index];
               return Card(
-                elevation: 3, // Add some elevation for a card-like effect
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Add margin for spacing
+                elevation: 3,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
                   title: Text(
                     '${item.name} - ${item.amount.toStringAsFixed(2)} ${item.unit}',
                     style: TextStyle(
-                      fontSize: 18, // Adjust the font size as needed
-                      fontWeight: FontWeight.bold, // Add bold for emphasis
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -87,8 +130,8 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
         onPressed: () {
           _navigateAndDisplaySelection(context);
         },
-        child: Icon(Icons.add,color: Colors.white,),
-        backgroundColor: Colors.green,
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
       ),
     );
   }
@@ -100,16 +143,33 @@ Future<void> _uploadGroceryItem(GroceryItem item) async {
     String userId = user.uid;
     DatabaseReference itemsRef = FirebaseDatabase.instance.reference().child('Users').child(userId).child('GroceryItems');
 
-    // Create a unique key for a new grocery item. If `push().key` is null, an error will be thrown.
-    String itemKey = itemsRef.push().key ?? 'default-key'; // Add a default key or handle null as needed
+    // Query to check if item with the same name already exists
+    Query query = itemsRef.orderByChild('name').equalTo(item.name);
+    await query.once().then((DatabaseEvent event) async {
+      if (event.snapshot.exists) {
+        // If item exists, update its amount
+        print("HERE\n");
+        Map<dynamic, dynamic> items = event.snapshot.value as Map<dynamic, dynamic>;
+        String itemKey = items.keys.first; // Assuming there's only one item with this name
+        var amount = items[itemKey]['amount'];
+        double existingAmount = (amount is int) ? amount.toDouble() : amount as double;
+        double newAmount = existingAmount + item.amount.toDouble();
 
-    // Set the data at the new location
-    await itemsRef.child(itemKey).set({
-      'name': item.name,
-      'amount': item.amount,
-      'unit': item.unit,
+        await itemsRef.child(itemKey).update({
+          'amount': newAmount,
+        });
+      } else {
+        // If item does not exist, create a new one
+        String itemKey = itemsRef.push().key ?? 'default-key'; // Add a default key or handle null as needed
+
+        await itemsRef.child(itemKey).set({
+          'name': item.name,
+          'amount': item.amount,
+          'unit': item.unit,
+        });
+      }
     }).catchError((error) {
-      print("Failed to add item: $error");
+      print("Failed to add or update item: $error");
     });
   }
 }
@@ -198,8 +258,7 @@ class SelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Items',style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.green,
+        title: Text('Select Items'),
       ),
       body: ListView(
         children: <Widget>[
@@ -254,4 +313,3 @@ class SelectionScreen extends StatelessWidget {
     );
   }
 }
-

@@ -7,7 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:meal_recommender/groceriesPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_recommender/recipes.dart';
-
+import 'globals.dart';
 import 'AdminRecipePage.dart';
 
 class AuthService {
@@ -31,21 +31,7 @@ class AuthService {
   }
 
 // Method to check if the currently signed-in user is an admin
-  Future<bool> checkIfUserIsAdmin() async {
-    User? currentUser = _firebaseAuth.currentUser;
 
-    if (currentUser != null) {
-      DataSnapshot userSnapshot = await _database.reference().child('admins').child(currentUser.uid).get();
-
-      // Check if the snapshot value is a map and contains the isAdmin key
-      if (userSnapshot.value is Map<String, dynamic>) {
-        Map<String, dynamic> userData = userSnapshot.value as Map<String, dynamic>;
-        return userData['isAdmin'] ?? false; // This assumes 'isAdmin' is a boolean field in your database
-      }
-    }
-
-    return false; // Return false if currentUser is null or userData is not a Map
-  }
 
 }
 
@@ -80,21 +66,15 @@ class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
 
-  bool isAdmin = true;
+
   @override
   void initState() {
     super.initState();
     fetchDataFromDatabase();
-    _checkAdminStatus();
+
   }
 
-  Future<void> _checkAdminStatus() async {
-    AuthService authService = AuthService();
-    bool isAdmin = await authService.checkIfUserIsAdmin();
-    setState(() {
-      isAdmin = isAdmin;
-    });
-  }
+
 
   final List<Widget> _pages = [
     /*  NutritionPage(),

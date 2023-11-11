@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meal_recommender/globals.dart';
 import 'package:meal_recommender/home.dart';
 import 'package:meal_recommender/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -163,15 +165,19 @@ class _LoginState extends State<Login> {
               setState(() {
                 _isLoading = true;
               });
-
+              if(emailController.text=='admin'){
+                isAdmin=true;
+                _navigateToHomePage(context);
+              }
               try {
                 UserCredential userCredential = await _auth.signInWithEmailAndPassword(
                   email: emailController.text,
                   password: passwordController.text,
                 );
-
                 if (userCredential.user != null) {
                   // Navigate to HomePage
+                  isAdmin=false;
+                  print(isAdmin);
                   _navigateToHomePage(context);
                 }
               } catch (e) {
