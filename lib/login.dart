@@ -165,10 +165,8 @@ class _LoginState extends State<Login> {
               setState(() {
                 _isLoading = true;
               });
-              if(emailController.text=='admin'){
-                isAdmin=true;
-                _navigateToHomePage(context);
-              }
+              print("HERE");
+
               try {
                 UserCredential userCredential = await _auth.signInWithEmailAndPassword(
                   email: emailController.text,
@@ -176,7 +174,10 @@ class _LoginState extends State<Login> {
                 );
                 if (userCredential.user != null) {
                   // Navigate to HomePage
-                  isAdmin=false;
+                  if(emailController.text=='admin@gmail.com'){
+                    isAdmin=true;
+                  }
+                  else isAdmin=false;
                   print(isAdmin);
                   _navigateToHomePage(context);
                 }
