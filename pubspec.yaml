@@ -43,6 +43,7 @@ dependencies:
   flutter_local_notifications: ^16.1.0
   cloud_firestore: ^4.13.0
   image_picker: ^1.0.4
+  firebase_admin: ^0.2.0
 
 
 dev_dependencies:

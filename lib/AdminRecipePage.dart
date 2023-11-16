@@ -73,12 +73,25 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
       'fat': _fatController.text,
       'recipe': _recipeController.text,
       'image': _uploadedFileURL,
+      'ingredients': ingredients.map((ingredient) => ingredient.toJson()).toList(),
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Recipe added successfully")),
     );
   }
 
+  List<Ingredient> ingredients = [];
+  void addIngredient() {
+    setState(() {
+      ingredients.add(Ingredient(name: '', amount: ''));
+    });
+  }
+
+  void removeIngredient(int index) {
+    setState(() {
+      ingredients.removeAt(index);
+    });
+  }
 
 
   List<String> mealTypes = ['breakfast', 'lunch', 'dinner'];
@@ -164,7 +177,46 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
             buildTextFormField(_fatController, 'Fat (g)', TextInputType.number),
             buildTextFormField(
                 _recipeController, 'Recipe Description', TextInputType.text),
-            SizedBox(height: 20), // Added some space before the button
+            SizedBox(height: 20),
+            ...ingredients.map((ingredient) {
+              int index = ingredients.indexOf(ingredient);
+              return Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: ingredient.name,
+                      onChanged: (newName) {
+                        ingredient.name = newName;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Ingredient Name',
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: ingredient.amount,
+                      onChanged: (newAmount) {
+                        ingredient.amount = newAmount;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Amount',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.remove_circle),
+                    onPressed: () => removeIngredient(index),
+                  ),
+                ],
+              );
+            }).toList(),
+
+            IconButton(
+              icon: Icon(Icons.add_circle),
+              onPressed: addIngredient,
+            ),// Added some space before the button
             ElevatedButton(
               child: Text('Add Recipe', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
@@ -204,4 +256,15 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
       ),
     );
   }
+}
+class Ingredient {
+  String name;
+  String amount;
+
+  Ingredient({required this.name, required this.amount});
+
+  Map<String, String> toJson() => {
+    'name': name,
+    'amount': amount,
+  };
 }

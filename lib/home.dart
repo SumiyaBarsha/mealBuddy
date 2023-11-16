@@ -306,6 +306,26 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              'Recommended For You',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
 
                 // Seventh Row: Meal Cards (Breakfast, Lunch, Snacks, Dinner with Kcal calculation)
                 Card(
