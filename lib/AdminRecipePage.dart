@@ -19,6 +19,8 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
   TextEditingController _fatController = TextEditingController();
   TextEditingController _recipeController = TextEditingController();
   TextEditingController _titleController = TextEditingController();
+  TextEditingController _kcalController = TextEditingController();
+
 
   @override
   void dispose() {
@@ -52,6 +54,9 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
         _uploadedFileURL = urlDownload;
       });
       print('Download-Link: $urlDownload');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Image uploaded successfully")),
+      );
     } catch (e) {
       print('error occured');
     }
@@ -71,6 +76,7 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
       'carbs': _carbsController.text,
       'protein': _proteinController.text,
       'fat': _fatController.text,
+      'kcal': _kcalController.text,
       'recipe': _recipeController.text,
       'image': _uploadedFileURL,
       'ingredients': ingredients.map((ingredient) => ingredient.toJson()).toList(),
@@ -78,6 +84,21 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Recipe added successfully")),
     );
+    // Clear the text fields
+    _titleController.clear();
+    _carbsController.clear();
+    _proteinController.clear();
+    _fatController.clear();
+    _recipeController.clear();
+    _kcalController.clear();
+
+    // Reset the image
+    setState(() {
+      selectedMealType = null;
+      _image = null;
+      _uploadedFileURL = null;
+      ingredients.clear();
+    });
   }
 
   List<Ingredient> ingredients = [];
@@ -170,13 +191,28 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
                 'Title', // Label text for the new field
                 TextInputType.text // Set the keyboard type to text
             ),
+            SizedBox(height: 5),
             buildTextFormField(
                 _carbsController, 'Carbohydrates (g)', TextInputType.number),
+            SizedBox(height: 5),
             buildTextFormField(
                 _proteinController, 'Protein (g)', TextInputType.number),
+            SizedBox(height: 5),
             buildTextFormField(_fatController, 'Fat (g)', TextInputType.number),
+            SizedBox(height: 5),
+            buildTextFormField(
+                _kcalController, 'KCal Count', TextInputType.text),
+            SizedBox(height: 5),
             buildTextFormField(
                 _recipeController, 'Recipe Description', TextInputType.text),
+            SizedBox(height: 20),
+            Text(
+              'Ingredients',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             SizedBox(height: 20),
             ...ingredients.map((ingredient) {
               int index = ingredients.indexOf(ingredient);

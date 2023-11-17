@@ -139,7 +139,7 @@ class _RecipesPageState extends State<RecipesPage> {
                             return buildCard(
                               recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                               recipe['title'] ?? 'Recipe Title',
-                              'Carbs' + recipe['carbs'],
+                              'Carbs' + recipe['carbs'], // add X Kcal here ,not carb
                             );
                           },
                         ),
