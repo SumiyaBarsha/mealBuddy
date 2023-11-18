@@ -23,7 +23,7 @@ class AccountSettingsPage extends StatelessWidget {
               content: 'a@gmail.com',
             ),
             SettingCard(
-              title: 'First name',
+              title: 'Your name',
               content: 'Your Name',
             ),
             SettingCard(
