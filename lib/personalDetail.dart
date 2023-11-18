@@ -36,7 +36,7 @@ class _personalDetailState extends State<personalDetail> {
     await prefs.setString('goalWeight', goalWeight ?? '');
     await prefs.setString('selectedDate', selectedDate.toIso8601String());
     await prefs.setString('gender', _selectedGender?.index.toString() ?? '');
-    await prefs.setString('goal', _selectedGoal?.index.toString() ?? '');
+    await prefs.setString('goal', _selectedGoal?.toString().split('.').last ?? '');
   }
 
   Future<void> loadData() async {
@@ -72,7 +72,7 @@ class _personalDetailState extends State<personalDetail> {
     name = prefs.getString('name') ?? 'Your Name';
     weight = prefs.getString('weight') ?? 'Select Weight';
     height = prefs.getString('height') ?? 'Select Height';
-    goalWeight = prefs.getString('goalWeight') ?? '';
+    goalWeight = prefs.getString('goalWeight') ?? 'Select Goal Weight';
     String? dateString = prefs.getString('selectedDate');
     if (dateString != null) {
       selectedDate = DateTime.parse(dateString);
@@ -82,8 +82,8 @@ class _personalDetailState extends State<personalDetail> {
       _selectedGender = Gender.values[int.parse(genderString)];
     }
     String? goalString = prefs.getString('goal');
-    if (goalString != null) {
-      _selectedGoal = Goal.values[int.parse(goalString)];
+    if (goalString != null && goalString.isNotEmpty) {
+      _selectedGoal = Goal.values.firstWhere((e) => e.toString() == 'Goal.$goalString');
     }
   }
 
