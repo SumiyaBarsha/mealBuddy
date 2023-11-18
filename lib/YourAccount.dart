@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Account Settings',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: AccountSettingsPage(),
-    );
-  }
-}
 
 class AccountSettingsPage extends StatelessWidget {
   @override
@@ -35,26 +23,12 @@ class AccountSettingsPage extends StatelessWidget {
               content: 'a@gmail.com',
             ),
             SettingCard(
-              title: 'First name',
+              title: 'Your name',
               content: 'Your Name',
-            ),
-            SettingCard(
-              title: 'Last name',
-              content: '', // Empty content for last name
             ),
             SettingCard(
               title: 'Password',
               content: '********',
-            ),
-            SettingCard(
-              title: 'Unit system',
-              content: 'European System',
-            ),
-            ListTile(
-              title: Text('Reset data'),
-              onTap: () {
-                // Handle reset data logic
-              },
             ),
             ListTile(
               title: Text('Delete account', style: TextStyle(color: Colors.red)),
