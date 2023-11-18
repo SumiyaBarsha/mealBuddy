@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/actvitylevel.dart';
 import 'package:meal_recommender/profile_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,9 +27,32 @@ class _personalDetailState extends State<personalDetail> {
   DateTime selectedDate = DateTime(2000, 8, 9);
    Gender? _selectedGender;
    Goal? _selectedGoal;
-  String? savedText;
-  String? savedWeight;
-  String? savedHeight;
+
+  String? name;
+  String? weight;
+  String? height;
+  String? goalWeight;
+
+  Future<void> saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', name ?? '');
+    await prefs.setString('weight', weight ?? '');
+    await prefs.setString('Height', height ?? '');
+  }
+
+  Future<void> loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    name = prefs.getString('name') ?? 'Your Name';
+    weight = prefs.getString('weight') ?? 'Select Weight';
+    // ... similarly for height, goalWeight, etc.
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +79,7 @@ class _personalDetailState extends State<personalDetail> {
                   ListTile(
                     title: Text('Goal weight'),
                     trailing: Text('Select Weight >'),
-                    onTap: () => _showDialog(context, 'Goal Weight'),
+                    onTap: () => _showDialog(context, 'Goal Weight','Goal Weight'),
                   ),
                 ],
               ),
@@ -71,19 +95,19 @@ class _personalDetailState extends State<personalDetail> {
                   ListTile(
                     title: Text('Name'),
                     trailing: Text((name ?? 'Your Name') + ' >'),
-                    onTap: () => _showDialog(context, 'First name'),
+                    onTap: () => _showDialog(context, 'First name', 'First name'),
                   ),
                   Divider(),
                   ListTile(
                     title: Text('Current weight'),
                     trailing: Text((weight ?? 'Select Weight')+ ' Kg >'),
-                    onTap: () => _showDialog(context, 'Weight in kg'),
+                    onTap: () => _showDialog(context, 'Weight in kg', 'Weight in kg'),
                   ),
                   Divider(),
                   ListTile(
                     title: Text('Height'),
                     trailing: Text((height ?? 'Select Height')+' cm >'),
-                    onTap: () => _showDialog(context, 'Height in cm'),
+                    onTap: () => _showDialog(context, 'Height in cm', 'Height in cm'),
                   ),
                   Divider(),
                   ListTile(
@@ -118,7 +142,7 @@ class _personalDetailState extends State<personalDetail> {
     );
   }
 
-  _showDialog(BuildContext context, String title) {
+  _showDialog(BuildContext context, String title, String field) {
     TextEditingController _controller = TextEditingController();
 
     showDialog(
@@ -147,7 +171,15 @@ class _personalDetailState extends State<personalDetail> {
               child: Text('Save'),
               onPressed: () {
                 setState(() {
-                  savedText = _controller.text;
+                  if (field == 'First name') {
+                    name = _controller.text;
+                  } else if (field == 'Weight in kg') {
+                    weight = _controller.text;
+                  } else if (field == 'Height in cm') {
+                    height = _controller.text;
+                  } else if (field == 'Goal Weight') {
+                    goalWeight = _controller.text;
+                  }
                 }); // Optionally, print it for debugging purposes
                 Navigator.of(context).pop(); // Close the dialog
               },

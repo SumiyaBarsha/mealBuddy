@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/firebase_api.dart';
+import 'package:meal_recommender/home.dart';
 import 'package:meal_recommender/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'firebase_api.dart';
 import 'notificationpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-//final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,10 +17,20 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseAPI().initNotifications();
-  runApp(MyApp());
+  final prefs = await SharedPreferences.getInstance();
+  final userEmail = prefs.getString('userEmail');
+  final bool isLoggedIn = userEmail != null;
+
+  var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+  var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({Key? key, required this.isLoggedIn}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -34,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Login(),
+      home: isLoggedIn ? HomePage() : Login(),
     );
   }
 }
