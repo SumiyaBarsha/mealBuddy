@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:meal_recommender/groceriesPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_recommender/recipes.dart';
+import 'mealSuggestion.dart';
 import 'globals.dart';
 import 'AdminRecipePage.dart';
 
@@ -48,15 +49,57 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   final DatabaseReference _dbRef =
   FirebaseDatabase.instance.ref().child("DRI");
-
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+  double? weight, height, age;
   double eatenValue = 0.0; // Initialize with actual values from DRI Tool
-  double kcalLeftValue = 0.0; // Initialize with actual values from DRI Tool
+// Initialize with actual values from DRI Tool
   double burnedValue = 0.0; // Initialize with actual values from DRI Tool
+
+
+  void fetchUserData() async {
+
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      String userId = user.uid;
+
+      DatabaseReference userRef = _database.reference().child('Users').child(userId);
+
+      try {
+
+        DatabaseEvent event = await userRef.once();
+        DataSnapshot dataSnapshot = event.snapshot;
+        // You can access the data using dataSnapshot.value
+        if (dataSnapshot.value != null) {
+          Map<dynamic, dynamic> userData = dataSnapshot.value as Map<dynamic, dynamic>;
+          // Parse the values
+          double? weight = _parseDouble(userData['weight']);
+          double? height = _parseDouble(userData['height']);
+          double? age = _parseDouble(userData['age']);
+          // Calculate kcalLeftValue and update state
+          setState(() {
+            kcalLeftValue = _calculateKcalLeftValue(weight, height, age);
+          });
+          print(kcalLeftValue);
+        } else {
+          print("User data not found.");
+        }
+      } catch (error) {
+        print("Error fetching user data: $error");
+      }
+    } else {
+      print("No user is signed in.");
+    }
+  }
+
 
   DateTime selectedDate = DateTime.now();
 
@@ -67,12 +110,6 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
 
-  @override
-  void initState() {
-    super.initState();
-    fetchDataFromDatabase();
-
-  }
 
 
   _selectDate(BuildContext context) async {
@@ -118,7 +155,13 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+  double _parseDouble(String? value) {
+    return value != null ? double.tryParse(value) ?? 0.0 : 0.0;
+  }
 
+  double _calculateKcalLeftValue(double? weight, double? height, double? age) {
+    return 88.362 + (13.397 * (weight ?? 0)) + (4.799 * (height ?? 0)) - (5.677 * (age ?? 0));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -327,28 +370,54 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Column(
                     children: <Widget>[
-                      MealCard(
-                        title: 'Breakfast',
-                        imageUrl: 'images/breakfast.png',
-                        calorieRange: 'Recommended 255 - 383 kcal',
+                      InkWell(
+                        onTap: () {
+                          // Action when Breakfast card is tapped
+                          mealtype = 'breakfast';
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MealSuggestionPage()),
+                          );
+                        },
+                        child: MealCard(
+                          title: 'Breakfast',
+                          imageUrl: 'images/breakfast.png',
+                          calorieRange: 'Recommended 255 - 383 kcal',
+                        ),
                       ),
                       Divider(),
-                      MealCard(
-                        title: 'Lunch',
-                        imageUrl: 'images/lunchbox.png',
-                        calorieRange: 'Recommended 383 - 510 kcal',
+                      InkWell(
+                        onTap: () {
+                          // Action when Lunch card is tapped
+                          print('Lunch tapped');
+                          mealtype = 'lunch';
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MealSuggestionPage()),
+                          );
+                        },
+                        child: MealCard(
+                          title: 'Lunch',
+                          imageUrl: 'images/lunchbox.png',
+                          calorieRange: 'Recommended 383 - 510 kcal',
+                        ),
                       ),
                       Divider(),
-                      MealCard(
-                        title: 'Dinner',
-                        imageUrl: 'images/meal.png',
-                        calorieRange: 'Recommended 383 - 510 kcal',
-                      ),
-                      Divider(),
-                      MealCard(
-                        title: 'Snacks',
-                        imageUrl: 'images/snacks.png',
-                        calorieRange: 'Recommended 64 - 128 kcal',
+                      InkWell(
+                        onTap: () {
+                          // Action when Dinner card is tapped
+                          print('Dinner tapped');
+                          mealtype = 'dinner';
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MealSuggestionPage()),
+                          );
+                        },
+                        child: MealCard(
+                          title: 'Dinner',
+                          imageUrl: 'images/meal.png',
+                          calorieRange: 'Recommended 383 - 510 kcal',
+                        ),
                       ),
                     ],
                   ),
