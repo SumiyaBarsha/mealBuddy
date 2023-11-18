@@ -83,6 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
           name = userData['name'];
           height = userData['height'];
           weight = userData['weight'];
+          age = userData['age'];
           setState(() {
             _profileImageUrl = userData['profileImageUrl'];
           });

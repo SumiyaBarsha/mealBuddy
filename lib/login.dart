@@ -177,7 +177,7 @@ class _LoginState extends State<Login> {
                   if(emailController.text=='admin@gmail.com'){
                     isAdmin=true;
                   }
-                  else isAdmin=false;
+                  else isAdmin=true;
                   print(isAdmin);
                   _navigateToHomePage(context);
                 }
