@@ -9,6 +9,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -139,8 +140,33 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _logout(BuildContext context) async {
+    // Sign out from FirebaseAuth
+    await FirebaseAuth.instance.signOut();
+
+    // Clear user session data
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userEmail');
+    await prefs.remove('isAdmin');
+
+    // Redirect to the login page
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (context) => Login(),
+    ));
+  }
+
+
 
   Widget build(BuildContext context) {
+    // Check if the user is currently signed in
+    if (FirebaseAuth.instance.currentUser == null) {
+      // User is not signed in. Redirect to login page.
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => Login(),
+        ));
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(color: Colors.black),
@@ -150,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           PopupMenuButton<String>(
             icon: Icon(Icons.settings, color: Colors.white),
-            onSelected: (String result) {
+            onSelected: (String result) async {
               if (result == 'account') {
                 // Go to your account page
                 Navigator.push(
@@ -158,10 +184,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   MaterialPageRoute(builder: (context) => AccountSettingsPage()),
                 );
               } else if (result == 'logout') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Login()),
-                );
+                await _logout(context);
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

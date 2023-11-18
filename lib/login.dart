@@ -4,6 +4,7 @@ import 'package:meal_recommender/globals.dart';
 import 'package:meal_recommender/home.dart';
 import 'package:meal_recommender/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Login extends StatefulWidget {
@@ -213,12 +214,37 @@ class _LoginState extends State<Login> {
   }
 
 
-  void _navigateToHomePage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),
-    );
+  void _navigateToHomePage(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      if (userCredential.user != null) {
+        // Save user session
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userEmail', emailController.text);
+        await prefs.setBool('isAdmin', emailController.text == 'admin@gmail.com');
+
+        // Navigate to HomePage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
+    } catch (e) {
+      print(e);
+      // You can show a dialog or snackbar here to inform the user about the error
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
+
 
   void _navigateToRegisterPage(BuildContext context) {
     Navigator.push(

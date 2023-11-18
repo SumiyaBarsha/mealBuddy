@@ -112,14 +112,6 @@ class _HomePageState extends State<HomePage> {
 
 
 
-
-  final List<Widget> _pages = [
-    /*  NutritionPage(),
-    RecipesPage(),
-    ProfilePage(),
-    SettingsPage(),*/
-  ];
-
   _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
