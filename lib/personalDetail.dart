@@ -37,15 +37,33 @@ class _personalDetailState extends State<personalDetail> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('name', name ?? '');
     await prefs.setString('weight', weight ?? '');
-    await prefs.setString('Height', height ?? '');
+    await prefs.setString('height', height ?? '');
+    await prefs.setString('goalWeight', goalWeight ?? '');
+    await prefs.setString('selectedDate', selectedDate.toIso8601String());
+    await prefs.setString('gender', _selectedGender?.index.toString() ?? '');
+    await prefs.setString('goal', _selectedGoal?.index.toString() ?? '');
   }
 
   Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
     name = prefs.getString('name') ?? 'Your Name';
     weight = prefs.getString('weight') ?? 'Select Weight';
-    // ... similarly for height, goalWeight, etc.
+    height = prefs.getString('height') ?? 'Select Height';
+    goalWeight = prefs.getString('goalWeight') ?? '';
+    String? dateString = prefs.getString('selectedDate');
+    if (dateString != null) {
+      selectedDate = DateTime.parse(dateString);
+    }
+    String? genderString = prefs.getString('gender');
+    if (genderString != null) {
+      _selectedGender = Gender.values[int.parse(genderString)];
+    }
+    String? goalString = prefs.getString('goal');
+    if (goalString != null) {
+      _selectedGoal = Goal.values[int.parse(goalString)];
+    }
   }
+
 
   @override
   void initState() {
@@ -180,6 +198,8 @@ class _personalDetailState extends State<personalDetail> {
                   } else if (field == 'Goal Weight') {
                     goalWeight = _controller.text;
                   }
+                  // Add call to saveData here
+                  saveData();
                 }); // Optionally, print it for debugging purposes
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -200,6 +220,7 @@ class _personalDetailState extends State<personalDetail> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        saveData();
       });
     }
   }
@@ -239,6 +260,7 @@ class _personalDetailState extends State<personalDetail> {
     if (selected != null) {
       setState(() {
         _selectedGender = selected;
+        saveData();
       });
     }
   }
@@ -257,6 +279,7 @@ class _personalDetailState extends State<personalDetail> {
                 groupValue: _selectedGoal,
                 onChanged: (Goal? value) {
                   Navigator.of(context).pop(value);
+
                 },
               ),
             ),
@@ -288,6 +311,7 @@ class _personalDetailState extends State<personalDetail> {
     if (selected != null) {
       setState(() {
         _selectedGoal = selected;
+        saveData(); // Call saveData here
       });
     }
   }
