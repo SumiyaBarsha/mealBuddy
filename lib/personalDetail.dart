@@ -3,16 +3,6 @@ import 'package:meal_recommender/actvitylevel.dart';
 import 'package:meal_recommender/profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-    );
-  }
-}
-
 class personalDetail extends StatefulWidget {
   const personalDetail({Key? key}) : super(key: key);
 
