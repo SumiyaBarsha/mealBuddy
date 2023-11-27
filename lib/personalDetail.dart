@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/actvitylevel.dart';
 import 'package:meal_recommender/profile_page.dart';
@@ -357,7 +358,6 @@ class _personalDetailState extends State<personalDetail> {
   }
 
 }
-
 
 
 
