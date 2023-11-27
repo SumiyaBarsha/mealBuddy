@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DRIToolPage extends StatefulWidget {
   @override
@@ -8,8 +8,8 @@ class DRIToolPage extends StatefulWidget {
 }
 
 class _DRIToolPageState extends State<DRIToolPage> {
-
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Instance of FirebaseAuth
 
   String? _selectedGender;
   String? _selectedActivityLevel;
@@ -21,6 +21,7 @@ class _DRIToolPageState extends State<DRIToolPage> {
   double? _fat;
   double? _carbohydrate;
   double? _protein;
+
 
   void _calculateValues() {
     double age = double.tryParse(_ageController.text) ?? 0;
@@ -39,6 +40,27 @@ class _DRIToolPageState extends State<DRIToolPage> {
       _protein = calculatedProtein; // Replace with your calculation result.
     }); // Rebuild the widget to show updated values
   }
+
+  void _saveDRIUnderUID() {
+    User? currentUser = _auth.currentUser; // Get the current user
+    if (currentUser != null) {
+      String uid = currentUser.uid; // Get the user's UID
+      // Set the DRI data under the user's UID
+      _dbRef.child('Users/$uid/DRI').set({
+        'calorie': _estimatedCalories,
+        'fat': _fat,
+        'carbs': _carbohydrate,
+        'protein': _protein,
+      }).then((_) {
+        print('Data saved under user UID: $uid');
+      }).catchError((error) {
+        print('Error: $error');
+      });
+    } else {
+      print('No user is currently signed in!');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,18 +143,7 @@ class _DRIToolPageState extends State<DRIToolPage> {
               ElevatedButton(
                 onPressed: ()  {
                 _calculateValues();
-
-                  // Set the calculated data in the "DRI" child of your database
-                _dbRef.child("DRI").set( {
-                  'calorie': _estimatedCalories,
-                  'fat': _fat,
-                  'carbs': _carbohydrate,
-                  'protein': _protein,
-                }).then((_) {
-                  print('Data saved');
-                }).catchError((error) {
-                  print('Error: $error');
-                });
+                _saveDRIUnderUID();
                 },
                 child: Text('Calculate'),
               ),

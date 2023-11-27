@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/actvitylevel.dart';
 import 'package:meal_recommender/profile_page.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-    );
-  }
-}
 
 class personalDetail extends StatefulWidget {
   const personalDetail({Key? key}) : super(key: key);
@@ -22,6 +14,7 @@ class personalDetail extends StatefulWidget {
 
 enum Gender { Male, Female }
 enum Goal { gain, maintain, lose }
+
 
 class _personalDetailState extends State<personalDetail> {
   DateTime selectedDate = DateTime(2000, 8, 9);
@@ -34,6 +27,7 @@ class _personalDetailState extends State<personalDetail> {
   String? goalWeight;
 
   Future<void> saveData() async {
+    final databaseReference = FirebaseDatabase.instance.reference();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('name', name ?? '');
     await prefs.setString('weight', weight ?? '');
@@ -45,6 +39,34 @@ class _personalDetailState extends State<personalDetail> {
   }
 
   Future<void> loadData() async {
+    final databaseReference = FirebaseDatabase.instance.ref();
+
+    databaseReference.child("Users/user_id").once().then((DatabaseEvent event) {
+      var userData = event.snapshot.value;
+      if (userData != null && userData is Map) {
+        setState(() {
+          name = userData['name'] ?? 'Your Name';
+          weight = userData['weight'] ?? 'Weight';
+          height = userData['Select height'] ?? 'Select Height';
+          goalWeight = userData['goalWeight'] ?? 'Select Goal Weight';
+          String? dateString = userData['selectedDate'];
+          if (dateString != null) {
+            selectedDate = DateTime.parse(dateString);
+          }
+          String? genderString = userData['gender'];
+          if (genderString != null) {
+            _selectedGender = Gender.values[int.parse(genderString)];
+          }
+          String? goalString = userData['goal'];
+          if (goalString != null && goalString.isNotEmpty) {
+            _selectedGoal = Goal.values.firstWhere((e) => e.toString() == 'Goal.$goalString');
+          }
+        });
+      } else {
+        // Handle the case where userData is null
+        // For example, set default values
+      }
+    });
     final prefs = await SharedPreferences.getInstance();
     name = prefs.getString('name') ?? 'Your Name';
     weight = prefs.getString('weight') ?? 'Select Weight';
@@ -74,6 +96,20 @@ class _personalDetailState extends State<personalDetail> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // Your UI building logic here
+          return buildProfileSettings();
+        } else {
+          // Show a loading indicator while the data is loading
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+  Widget buildProfileSettings() {
     return Scaffold(
       appBar: AppBar(title: Text('Profile Settings', style: TextStyle(color: Colors.white)),
       backgroundColor: Colors.green,),
@@ -96,7 +132,7 @@ class _personalDetailState extends State<personalDetail> {
                   Divider(),
                   ListTile(
                     title: Text('Goal weight'),
-                    trailing: Text('Select Weight >'),
+                    trailing: Text((goalWeight ?? 'Select Goal weight') + ' Kg' +' >'),
                     onTap: () => _showDialog(context, 'Goal Weight','Goal Weight'),
                   ),
                 ],
@@ -141,15 +177,6 @@ class _personalDetailState extends State<personalDetail> {
                     title: Text('Gender'),
                     trailing: Text((_selectedGender == Gender.Male ? 'Male' : 'Female') + ' >'),
                     onTap: _selectGender,
-                  ),
-                  Divider(),
-                  ListTile(
-                    title: Text('Activity Level'),
-                    trailing: Text('Moderate >'),
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ActivityLevelDialog()),
-                      );
-                    },
                   ),
                 ],
               ),
@@ -196,7 +223,7 @@ class _personalDetailState extends State<personalDetail> {
                   } else if (field == 'Height in cm') {
                     height = _controller.text;
                   } else if (field == 'Goal Weight') {
-                    goalWeight = _controller.text;
+                    goalWeight = _controller.text; // Make sure this matches the string you pass
                   }
                   // Add call to saveData here
                   saveData();
@@ -315,6 +342,7 @@ class _personalDetailState extends State<personalDetail> {
       });
     }
   }
+
   String _goalText(Goal? goal) {
     switch (goal) {
       case Goal.gain:
@@ -327,7 +355,6 @@ class _personalDetailState extends State<personalDetail> {
         return 'Select Goal';  // Default text if goal is null or not set
     }
   }
-
 
 }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/BMIcalc.dart';
-import 'package:meal_recommender/fixedDiet.dart';
 import 'package:meal_recommender/notificationpage.dart';
 import 'package:meal_recommender/profile_page.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -462,19 +461,6 @@ class _HomePageState extends State<HomePage> {
               child: Icon(Icons.calculate_outlined),
             ),
             label: 'Health Monitor',
-          ),
-          BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DietPlanPage() ),
-                );
-              },
-              child: Icon(Icons.list_alt_outlined),
-            ),
-            label: 'Progress',
           ),
           BottomNavigationBarItem(
             icon: GestureDetector(
