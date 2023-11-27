@@ -23,6 +23,8 @@ class _RegisterState extends State<Register> {
   final TextEditingController confirmPasswordController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
 
 
 
@@ -30,7 +32,8 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register'),
+        backgroundColor: Colors.green,
+        title: Text('Register',style: TextStyle(color: Colors.white),),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -49,6 +52,10 @@ class _RegisterState extends State<Register> {
               buildHeightField(),
               SizedBox(height: 20),
               buildWeightField(),
+              SizedBox(height: 20),
+              buildAgeField(),
+              SizedBox(height: 20),
+              buildGenderField(),
               SizedBox(height: 20),
               buildRegisterButton(),
               SizedBox(height: 10),
@@ -196,6 +203,51 @@ class _RegisterState extends State<Register> {
       ],
     );
   }
+  Widget buildAgeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Age',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        TextFormField(
+          controller: ageController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            hintText: 'Enter your age',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildGenderField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Gender',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        TextFormField(
+          controller: genderController,
+          keyboardType: TextInputType.text,
+          decoration: InputDecoration(
+            hintText: 'Enter your gender',
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget buildRegisterButton() {
     return Container(
@@ -217,6 +269,8 @@ class _RegisterState extends State<Register> {
                   'email': emailController.text,
                   'height': heightController.text,
                   'weight': weightController.text,
+                  'age' : ageController.text,
+                  'gender' : genderController.text,
                   'dob': DateTime(1990, 1, 1),
                 });
                 await showDialog(

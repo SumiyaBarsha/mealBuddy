@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommender/actvitylevel.dart';
 import 'package:meal_recommender/profile_page.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -26,34 +27,47 @@ class _personalDetailState extends State<personalDetail> {
   String? goalWeight;
 
   Future<void> saveData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('name', name ?? '');
-    await prefs.setString('weight', weight ?? '');
-    await prefs.setString('height', height ?? '');
-    await prefs.setString('goalWeight', goalWeight ?? '');
-    await prefs.setString('selectedDate', selectedDate.toIso8601String());
-    await prefs.setString('gender', _selectedGender?.index.toString() ?? '');
-    await prefs.setString('goal', _selectedGoal?.toString().split('.').last ?? '');
-  }
+    final databaseReference = FirebaseDatabase.instance.reference();
 
+    databaseReference.child("users/user_id").set({
+      'name': name ?? '',
+      'weight': weight ?? '',
+      'height': height ?? '',
+      'goalWeight': goalWeight ?? '',
+      'selectedDate': selectedDate.toIso8601String(),
+      'gender': _selectedGender?.index.toString() ?? '',
+      'goal': _selectedGoal?.toString().split('.').last ?? ''
+    });
+  }
   Future<void> loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    name = prefs.getString('name') ?? 'Your Name';
-    weight = prefs.getString('weight') ?? 'Select Weight';
-    height = prefs.getString('height') ?? 'Select Height';
-    goalWeight = prefs.getString('goalWeight') ?? 'Select Goal Weight';
-    String? dateString = prefs.getString('selectedDate');
-    if (dateString != null) {
-      selectedDate = DateTime.parse(dateString);
-    }
-    String? genderString = prefs.getString('gender');
-    if (genderString != null) {
-      _selectedGender = Gender.values[int.parse(genderString)];
-    }
-    String? goalString = prefs.getString('goal');
-    if (goalString != null && goalString.isNotEmpty) {
-      _selectedGoal = Goal.values.firstWhere((e) => e.toString() == 'Goal.$goalString');
-    }
+    final databaseReference = FirebaseDatabase.instance.ref();
+
+    databaseReference.child("Users/user_id").once().then((DatabaseEvent event) {
+      var userData = event.snapshot.value;
+      if (userData != null && userData is Map) {
+        setState(() {
+          name = userData['name'] ?? 'Your Name';
+          weight = userData['weight'] ?? 'Weight';
+          height = userData['Select height'] ?? 'Select Height';
+          goalWeight = userData['goalWeight'] ?? 'Select Goal Weight';
+          String? dateString = userData['selectedDate'];
+          if (dateString != null) {
+            selectedDate = DateTime.parse(dateString);
+          }
+          String? genderString = userData['gender'];
+          if (genderString != null) {
+            _selectedGender = Gender.values[int.parse(genderString)];
+          }
+          String? goalString = userData['goal'];
+          if (goalString != null && goalString.isNotEmpty) {
+            _selectedGoal = Goal.values.firstWhere((e) => e.toString() == 'Goal.$goalString');
+          }
+        });
+      } else {
+        // Handle the case where userData is null
+        // For example, set default values
+      }
+    });
   }
 
 

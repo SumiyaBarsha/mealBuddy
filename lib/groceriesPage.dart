@@ -3,10 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 
-void main() {
-  runApp(MyGroceryApp());
-}
-
 class MyGroceryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -33,8 +29,6 @@ class GroceryItem {
   GroceryItem(this.name, this.amount, this.unit);
 }
 
-
-
 class _MyGroceryPageState extends State<MyGroceryPage> {
   List<GroceryItem> _groceryItems = [];
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child('Users'); // Adjust the reference path as needed
@@ -54,26 +48,53 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
 
       itemsRef.once().then((DatabaseEvent event) {
         if (event.snapshot.exists) {
-          final values = event.snapshot.value as Map<dynamic, dynamic>;
-          _groceryItems.clear(); // Clear the list before adding new items
-
+          final values = Map<String, dynamic>.from(event.snapshot.value as Map);
+          List<GroceryItem> newItems = [];
           values.forEach((key, value) {
-            // Parse the data and add to the list
-            _groceryItems.add(GroceryItem(
+            newItems.add(GroceryItem(
               value['name'],
-              value['amount']?.toDouble() ?? 0.0,
+              (value['amount'] as num).toDouble(),
               value['unit'],
             ));
           });
-
-          setState(() {}); // Update the UI after fetching data
+          setState(() {
+            _groceryItems = newItems; // Update the grocery items list with new items
+          });
+        } else {
+          setState(() {
+            _groceryItems = []; // If snapshot doesn't exist, set grocery items to an empty list
+          });
         }
       }).catchError((error) {
         print("Failed to fetch items: $error");
       });
-
     }
   }
+
+
+  Future<void> _deleteGroceryItem(GroceryItem item) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      DatabaseReference itemsRef = FirebaseDatabase.instance.reference().child('Users').child(userId).child('GroceryItems');
+
+      // Query to find the item with the name
+      Query query = itemsRef.orderByChild('name').equalTo(item.name);
+      await query.once().then((DatabaseEvent event) async {
+        if (event.snapshot.exists) {
+          Map<dynamic, dynamic> items = event.snapshot.value as Map<dynamic, dynamic>;
+          String itemKey = items.keys.first; // Assuming there's only one item with this name
+
+          // Delete the item
+          await itemsRef.child(itemKey).remove();
+          _fetchGroceryItems() ; // Refresh the list after deletion
+        }
+      }).catchError((error) {
+        print("Failed to delete item: $error");
+      });
+    }
+  }
+
 
   void _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.push(
@@ -93,18 +114,11 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grocery List'),
+        backgroundColor: Colors.green,
+        title: Text('Grocery List',style: TextStyle(color: Colors.white),),
       ),
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("images/groceries.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           ListView.builder(
             itemCount: _groceryItems.length,
             itemBuilder: (context, index) {
@@ -120,22 +134,30 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      _deleteGroceryItem(item); // Call the delete function
+                    },
+                  ),
                 ),
               );
             },
           ),
+
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _navigateAndDisplaySelection(context);
         },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
+        child: Icon(Icons.add,color: Colors.white,),
+        backgroundColor: Colors.green,
       ),
     );
   }
 }
+
 
 Future<void> _uploadGroceryItem(GroceryItem item) async {
   User? user = FirebaseAuth.instance.currentUser;

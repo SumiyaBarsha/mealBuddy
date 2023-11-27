@@ -3,27 +3,15 @@ import 'package:meal_recommender/YourAccount.dart';
 import 'package:meal_recommender/dietneedsPage.dart';
 import 'package:meal_recommender/dritool.dart';
 import 'package:meal_recommender/login.dart';
-import 'package:meal_recommender/personalDetail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:meal_recommender/personalDetail2.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-    );
-  }
-}
+enum Goal { Gain, Maintain, Lose }
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -66,33 +54,19 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
   void fetchUserData() async {
-
-    User? user = _auth.currentUser;
-
+    final User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      String userId = user.uid;
-
-      DatabaseReference userRef = _database.reference().child('Users').child(userId);
-
+      DatabaseReference userRef = FirebaseDatabase.instance.ref().child('Users/${user.uid}');
       try {
         DatabaseEvent event = await userRef.once();
-        DataSnapshot dataSnapshot = event.snapshot;
-        // You can access the data using dataSnapshot.value
-        if (dataSnapshot.value != null) {
-          Map<dynamic, dynamic> userData = dataSnapshot.value as Map<dynamic, dynamic>;
-
-          name = userData['name'];
-          height = userData['height'];
-          weight = userData['weight'];
-          age = userData['age'];
+        Map<dynamic, dynamic>? userData = event.snapshot.value as Map<dynamic, dynamic>?;
+        if (userData != null) {
           setState(() {
-            _profileImageUrl = userData['profileImageUrl'];
+            name = userData['name'] as String?;
+            weight = userData['weight'] as String?;
+            goal =  userData['goal'] as String?;
+            _profileImageUrl = userData['profileImageUrl'] as String?;
           });
-
-          // Access other user information as needed
-          print("Name: $name");
-          print("height: $height");
-          print("weight: $weight");
         } else {
           print("User data not found.");
         }
@@ -103,6 +77,8 @@ class _ProfilePageState extends State<ProfilePage> {
       print("No user is signed in.");
     }
   }
+
+
 
   Future<void> _editProfileImage() async {
     final picker = ImagePicker();
@@ -124,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
         final url = await ref.getDownloadURL();
 
         // Update the profile image URL in the database
-        await _database.reference().child('Users').child(_auth.currentUser!.uid).update({
+        await _database.ref().child('Users').child(_auth.currentUser!.uid).update({
           'profileImageUrl': url,
         });
 
@@ -158,9 +134,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
   Widget build(BuildContext context) {
-    // Check if the user is currently signed in
+
     if (FirebaseAuth.instance.currentUser == null) {
-      // User is not signed in. Redirect to login page.
+
       WidgetsBinding.instance?.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => Login(),
@@ -252,9 +228,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Divider(thickness: 2, color: Colors.grey[300]), // Divider for differentiation
                     SizedBox(height: 8),
-                    RowData(title: "Current weight", value: (weight ?? "55")+" Kg"),
-                    RowData(title: "Goal", value: goal ?? "Maintain weight"),
-                    RowData(title: "Active Diet", value: diet ?? "Standard"),
+                    RowData(
+                      title: "Current weight",
+                      value: "${weight ?? "Not set"} Kg",
+                    ),
+
+                    RowData(
+                      title: "Goal",
+                      value: "${goal ?? "Not set"} Weight",
+                    ),
                   ],
                 ),
               ),
@@ -277,7 +259,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => personalDetail()),
+                          MaterialPageRoute(builder: (context) => ProfileSettingsPage()),
                         );
                       },
                     ),
