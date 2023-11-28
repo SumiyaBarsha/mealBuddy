@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:meal_recommender/globals.dart';
 import 'globals.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class MealSuggestionPage extends StatefulWidget {
   @override
   _MealSuggestionPageState createState() => _MealSuggestionPageState();
@@ -14,7 +15,68 @@ class Pair<T1, T2> {
   Pair(this.first, this.second);
 }
 
+class GroceryItem {
+  String name;
+  double amount;
+  String unit;
+
+  GroceryItem(this.name, this.amount, this.unit);
+}
+
+bool isIngredientSufficient(GroceryItem item, Map ingredient) {
+  if(ingredient['name']=='Vegetable Oil'){
+    print(item.name);
+  }
+  if (item.name == ingredient['name']) {
+    double requiredAmount = double.tryParse(ingredient['amount']) ?? 0;
+    if(item.name=='Vegetable Oil'){
+      print('HERE');
+      print(item.amount);
+      print(requiredAmount);
+    }
+    return item.amount >= requiredAmount;
+  }
+  return false;
+}
+
+bool areAllIngredientsSufficient(List<GroceryItem> userGroceryItems, Map recipe) {
+
+  print(recipe['title']);
+  if (recipe['ingredients'] is! List || (recipe['ingredients'] as List).any((item) => item is! Map)) {
+    print('Error: Ingredients are not in the expected format '+recipe['title']);
+    return false;
+  }
+  List<Map> ingredients = List<Map>.from(recipe['ingredients']);
+  for (var ingredient in ingredients) {
+    bool foundAndSufficient = false;
+    for (var item in userGroceryItems) {
+      if (isIngredientSufficient(item, ingredient)) {
+        foundAndSufficient = true;
+        break;
+      }
+    }
+    if(recipe['title']=='Egg Omelette'){
+      print(foundAndSufficient);
+      print(ingredient);
+    }
+    if (!foundAndSufficient) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void checkRecipe(Map recipe, List<GroceryItem> userGroceryItems) {
+  bool sufficient = areAllIngredientsSufficient(userGroceryItems, recipe);
+  if (sufficient) {
+    print("All ingredients for the recipe '${recipe['title']}' are sufficient.");
+  } else {
+    print("Ingredients for the recipe '${recipe['title']}' are not sufficient.");
+  }
+}
+
 class _MealSuggestionPageState  extends State<MealSuggestionPage> {
+  List<GroceryItem> _userGroceryItems = [];
   int _selectedIndex = 0;
   final DatabaseReference _recipesRef = FirebaseDatabase.instance.ref().child('recipes');
   List<Pair<double, String>> vectorOfPairs = [] , vectorOfPairsL = [] ,vectorOfPairsG = [];
@@ -28,12 +90,70 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
   void initState() {
     super.initState();
     loadDataFromFirebase();
+    _fetchUserGroceryItems();
     print("2");
     for (var pair in vectorOfPairs) {
       print("${pair.first} -> ${pair.second}");
     }
 
   }
+
+
+  void _fetchUserGroceryItems() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    print('HERE1');
+    if (user != null) {
+      DatabaseReference itemsRef = FirebaseDatabase.instance.ref('Users/${user.uid}/GroceryItems');
+      print('HERE2');
+      print(itemsRef);
+      // Fetch the grocery items
+      DatabaseEvent event = await itemsRef.once();
+      if (event.snapshot.exists) {
+        List<GroceryItem> fetchedItems = [];
+        Map<dynamic, dynamic> items = event.snapshot.value as Map<dynamic, dynamic>;
+
+        items.forEach((key, value) {
+          // Ensure that 'amount' is a number and 'name' and 'unit' are strings
+          double amount = 0;
+          String name = '';
+          String unit = '';
+
+          if (value['amount'] is int) {
+            amount = (value['amount'] as int).toDouble();
+          } else if (value['amount'] is double) {
+            amount = value['amount'];
+          } else {
+            print('Amount is not a number');
+          }
+
+          if (value['name'] is String) {
+            name = value['name'];
+          } else {
+            print('Name is not a string');
+          }
+
+          if (value['unit'] is String) {
+            unit = value['unit'];
+          } else {
+            print('Unit is not a string');
+          }
+
+          fetchedItems.add(GroceryItem(name, amount, unit));
+        });
+
+        setState(() {
+          _userGroceryItems = fetchedItems;
+          print(fetchedItems);
+        });
+      } else {
+        print("No grocery items found for user: ${user.uid}");
+      }
+    } else {
+      print("No user logged in");
+    }
+  }
+
+
   void loadDataFromFirebase() async {
     _recipesRef.once().then((DatabaseEvent event) {
       if (event.snapshot.exists) {
@@ -80,6 +200,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
             if(kcal<0){
               kcal=-kcal;
             }
+
             return Pair<double, String>(kcal, recipe['title'] as String);
           }).toList();
           print("0");
@@ -124,51 +245,53 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Use as little space as necessary
-            children: <Widget>[
-              Image.network(
-                recipe['image'] ?? 'https://via.placeholder.com/150',
-                height: 200, // Fixed height for the image
-                width: double.infinity, // Image takes the full width of the dialog
-                fit: BoxFit.cover,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      recipe['title'] ?? 'Recipe Title',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.0,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text('Carbohydrates: ${recipe['carbs'] ?? 'N/A'}g'),
-                    SizedBox(height: 4),
-                    Text('Protein: ${recipe['protein'] ?? 'N/A'}g'),
-                    SizedBox(height: 4),
-                    Text('Fat: ${recipe['fat'] ?? 'N/A'}g'),
-                    SizedBox(height: 10),
-                    Text(
-                      'Description:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(recipe['description'] ?? 'No description provided.'),
-                  ],
+          child: SingleChildScrollView( // Wrap the content in a SingleChildScrollView
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Use as little space as necessary
+              children: <Widget>[
+                Image.network(
+                  recipe['image'] ?? 'https://via.placeholder.com/150',
+                  height: 200, // Fixed height for the image
+                  width: double.infinity, // Image takes the full width of the dialog
+                  fit: BoxFit.cover,
                 ),
-              ),
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        recipe['title'] ?? 'Recipe Title',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24.0,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text('Carbohydrates: ${recipe['carbs'] ?? 'N/A'}g'),
+                      SizedBox(height: 4),
+                      Text('Protein: ${recipe['protein'] ?? 'N/A'}g'),
+                      SizedBox(height: 4),
+                      Text('Fat: ${recipe['fat'] ?? 'N/A'}g'),
+                      SizedBox(height: 10),
+                      Text(
+                        'Description:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(recipe['description'] ?? 'No description provided.'),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -260,6 +383,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                                 recipe['fat'],
                                 recipe['protein'],
                                 recipe['recipe'],
+                                recipe,
 
                               );
                             },
@@ -327,6 +451,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                                 recipe['fat'],
                                 recipe['protein'],
                                 recipe['recipe'],
+                                recipe,
 
                               );
                             },
@@ -394,6 +519,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                                 recipe['fat'],
                                 recipe['protein'],
                                 recipe['recipe'],
+                                recipe,
 
                               );
                             },
@@ -417,10 +543,16 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
     );
   }
 
-  Widget buildCard(String imageUrl, String title, String carbs, String kcal, String fat, String protein,String sub) {
+  Widget buildCard(String imageUrl, String title, String carbs, String kcal, String fat, String protein, String sub, Map recipe) {
+    print(recipe['title']);
+    bool isSufficient = areAllIngredientsSufficient(_userGroceryItems, recipe);
+    print(_userGroceryItems);
+
+    // Determine the card color based on ingredient sufficiency
+    Color cardColor = isSufficient ? Colors.white : Colors.redAccent;
+
     return InkWell(
       onTap: () {
-        // You would need to pass the actual recipe Map data here
         showRecipeDetails({
           'image': imageUrl,
           'title': title,
@@ -429,12 +561,11 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
           'protein': protein,
           'carbs': carbs,
           'description': sub,
-          // Add other recipe details here as needed
         });
         print('Card tapped!');
-
       },
       child: Card(
+        color: cardColor,  // Use the cardColor determined by ingredient sufficiency
         margin: EdgeInsets.all(8.0),
         child: Container(
           width: 160, // Adjust the width to fit your design
@@ -453,7 +584,9 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text('kcal: '+kcal),
+                child: Text(isSufficient ? 'Ingredients sufficient' : 'Ingredients insufficient',
+                  style: TextStyle(color: isSufficient ? Colors.black : Colors.white), // Change text color based on sufficiency
+                ),
               ),
             ],
           ),
@@ -461,4 +594,6 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
       ),
     );
   }
+
+
 }

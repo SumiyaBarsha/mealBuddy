@@ -51,9 +51,13 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
           final values = Map<String, dynamic>.from(event.snapshot.value as Map);
           List<GroceryItem> newItems = [];
           values.forEach((key, value) {
+            double tmp= (value['amount'] as num).toDouble();
+            if(value['unit']=='KG'){
+              tmp=tmp/1000;
+            }
             newItems.add(GroceryItem(
               value['name'],
-              (value['amount'] as num).toDouble(),
+              tmp,
               value['unit'],
             ));
           });
@@ -115,7 +119,15 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: Text('Grocery List',style: TextStyle(color: Colors.white),),
+        title: Text('Grocery List', style: TextStyle(color: Colors.white)),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              _fetchGroceryItems(); // Refresh the grocery items list
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -183,7 +195,9 @@ Future<void> _uploadGroceryItem(GroceryItem item) async {
       } else {
         // If item does not exist, create a new one
         String itemKey = itemsRef.push().key ?? 'default-key'; // Add a default key or handle null as needed
-
+        if(item.unit=='KG'){
+          item.amount=item.amount*1000;
+        }
         await itemsRef.child(itemKey).set({
           'name': item.name,
           'amount': item.amount,
@@ -276,61 +290,46 @@ Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) a
 
 
 class SelectionScreen extends StatelessWidget {
+  final List<String> items = [
+    'Milk',
+    'Bread',
+    'Potatoes',
+    'Tomatoes',
+    'Egg',
+    'Wheat Flour',
+    'Ghee',
+    'Vegetable oil',
+    'Egg White',
+    'All Purpose Flour',
+    'Mayonnaise',
+    'Cucumber',
+    'Green Chilli',
+    'Onion',
+    'Chicken',
+    'Cheese',
+    // ... Add more items here
+  ];
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Select Items'),
       ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            title: Text('Milk'),
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(items[index]),
             onTap: () async {
-              final item = await _showAddItemDialog(context, 'Milk');
+              final item = await _showAddItemDialog(context, items[index]);
               if (item != null) {
                 Navigator.pop(context, item);
               }
             },
-          ),
-          ListTile(
-            title: Text('Bread'),
-            onTap: () async {
-              final item = await _showAddItemDialog(context, 'Bread');
-              if (item != null) {
-                Navigator.pop(context, item);
-              }
-            },
-          ),
-          ListTile(
-            title: Text('Potatoes'),
-            onTap: () async {
-              final item = await _showAddItemDialog(context, 'Potatoes');
-              if (item != null) {
-                Navigator.pop(context, item);
-              }
-            },
-          ),
-          ListTile(
-            title: Text('Tomatoes'),
-            onTap: () async {
-              final item = await _showAddItemDialog(context, 'Tomatoes');
-              if (item != null) {
-                Navigator.pop(context, item);
-              }
-            },
-          ),
-          ListTile(
-            title: Text('Eggs'),
-            onTap: () async {
-              final item = await _showAddItemDialog(context, 'Eggs');
-              if (item != null) {
-                Navigator.pop(context, item);
-              }
-            },
-          ),
-          // ... Add more ListTiles for other items
-        ],
+          );
+        },
       ),
     );
   }
