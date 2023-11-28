@@ -6,6 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'firebase_api.dart';
 import 'notificationpage.dart';
+import 'package:meal_recommender/home.dart';
+import 'notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -13,20 +15,25 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNo
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await FirebaseAPI().initNotifications();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    NotificationService notificationService = NotificationService();
+    await notificationService.init();
+
+    //await FirebaseAPI().initNotifications();
+  }catch (e) {
+    print('Error during initialization: $e');
+  }
   final prefs = await SharedPreferences.getInstance();
   final userEmail = prefs.getString('userEmail');
   final bool isLoggedIn = userEmail != null;
-
-  var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-  var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
   runApp(MyApp(isLoggedIn: isLoggedIn));
 }
+
+final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
 
@@ -38,10 +45,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'Flutter login UI',
-      routes: {
-        NotificationPage.route: (context) => const NotificationPage(),
-        // Define other routes if necessary
-      },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -51,3 +54,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

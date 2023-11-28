@@ -33,11 +33,11 @@ class FirebaseAPI {
 
 
   void handleMessage(RemoteMessage? message){
-    if(message == null) return;
-    navigatorKey.currentState?.pushNamed(
-      NotificationPage.route,
-      arguments: message.data,
-    );
+   // if(message == null) return;
+   // navigatorKey.currentState?.pushNamed(
+      //NotificationPage(),
+      //arguments: message.data,
+   // );
   }
 
 
