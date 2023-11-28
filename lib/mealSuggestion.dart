@@ -158,7 +158,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(recipe['recipe'] ?? 'No description provided.'),
+                    Text(recipe['description'] ?? 'No description provided.'),
                   ],
                 ),
               ),
@@ -255,7 +255,12 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                               return buildCard(
                                 recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                                 recipe['title'] ?? 'Recipe Title',
-                                'Kcal ' + recipe['carbs'], // assuming 'carbs' is a String
+                                recipe['carbs'],
+                                recipe['kcal'].toString(),
+                                recipe['fat'],
+                                recipe['protein'],
+                                recipe['recipe'],
+
                               );
                             },
                           ),
@@ -317,7 +322,12 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                               return buildCard(
                                 recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                                 recipe['title'] ?? 'Recipe Title',
-                                'Kcal ' + recipe['carbs'], // assuming 'carbs' is a String
+                                recipe['carbs'],
+                                recipe['kcal'].toString(),
+                                recipe['fat'],
+                                recipe['protein'],
+                                recipe['recipe'],
+
                               );
                             },
                           ),
@@ -379,7 +389,12 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                               return buildCard(
                                 recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                                 recipe['title'] ?? 'Recipe Title',
-                                'Kcal ' + recipe['carbs'], // assuming 'carbs' is a String
+                                recipe['carbs'],
+                                recipe['kcal'].toString(),
+                                recipe['fat'],
+                                recipe['protein'],
+                                recipe['recipe'],
+
                               );
                             },
                           ),
@@ -402,16 +417,22 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
     );
   }
 
-  Widget buildCard(String imageUrl, String title, String subtitle) {
+  Widget buildCard(String imageUrl, String title, String carbs, String kcal, String fat, String protein,String sub) {
     return InkWell(
       onTap: () {
         // You would need to pass the actual recipe Map data here
         showRecipeDetails({
           'image': imageUrl,
           'title': title,
+          'kcal': kcal,
+          'fat': fat,
+          'protein': protein,
+          'carbs': carbs,
+          'description': sub,
           // Add other recipe details here as needed
         });
         print('Card tapped!');
+
       },
       child: Card(
         margin: EdgeInsets.all(8.0),
@@ -432,7 +453,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(subtitle),
+                child: Text('kcal: '+kcal),
               ),
             ],
           ),
