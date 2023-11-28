@@ -7,8 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:meal_recommender/notificationpage.dart';
 import 'package:meal_recommender/personalDetail2.dart';
 import 'dart:io';
+import 'notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum Goal { Gain, Maintain, Lose }
@@ -43,6 +45,7 @@ class RowData extends StatelessWidget {
 String? name,height,weight,age,goal,diet;
 class _ProfilePageState extends State<ProfilePage> {
   String? _profileImageUrl;
+  bool reminderSet = false;
   @override
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -279,12 +282,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     Divider(thickness: 1, color: Colors.grey[300]), // Divider for differentiation
                     ListTile(
                       leading: Icon(Icons.circle, color: Colors.green, size: 20),
-                      title: Text('Dietary needs & preferences'),
+                      title: Text('Daily Meal Reminder'),
+                      subtitle: Text('Schedule your notification'),
                       trailing: Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => DietaryPreferencesPage()),
+                          MaterialPageRoute(builder: (context) => notificationpage()),
                         );
                       },
                     ),
