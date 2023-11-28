@@ -47,7 +47,7 @@ class NotificationService {
     final InitializationSettings initializationSettings =
     InitializationSettings(
       android: androidInitializationSettings,
-     // iOS: iOSInitializationSettings,
+      // iOS: iOSInitializationSettings,
     );
 
     // *** Initialize timezone here ***
@@ -57,7 +57,7 @@ class NotificationService {
 
 
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+        initializationSettings,
         onSelectNotification : onSelectNotification);
   }
   Future<void> onSelectNotification(String? payload) async {
@@ -123,7 +123,6 @@ class NotificationService {
   }
 
 }
-
 
 
 

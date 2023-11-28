@@ -22,56 +22,59 @@ class _RecipesPageState extends State<RecipesPage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Use as little space as necessary
-            children: <Widget>[
-              Image.network(
-                recipe['image'] ?? 'https://via.placeholder.com/150',
-                height: 200, // Fixed height for the image
-                width: double.infinity, // Image takes the full width of the dialog
-                fit: BoxFit.cover,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      recipe['title'] ?? 'Recipe Title',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.0,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text('Carbohydrates: ${recipe['carbs'] ?? 'N/A'}g'),
-                    SizedBox(height: 4),
-                    Text('Protein: ${recipe['protein'] ?? 'N/A'}g'),
-                    SizedBox(height: 4),
-                    Text('Fat: ${recipe['fat'] ?? 'N/A'}g'),
-                    SizedBox(height: 10),
-                    Text(
-                      'Description:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(recipe['description'] ?? 'No description provided.'),
-                  ],
+          child: SingleChildScrollView( // Wrap the content in a SingleChildScrollView
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Use as little space as necessary
+              children: <Widget>[
+                Image.network(
+                  recipe['image'] ?? 'https://via.placeholder.com/150',
+                  height: 200, // Fixed height for the image
+                  width: double.infinity, // Image takes the full width of the dialog
+                  fit: BoxFit.cover,
                 ),
-              ),
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        recipe['title'] ?? 'Recipe Title',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24.0,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text('Carbohydrates: ${recipe['carbs'] ?? 'N/A'}g'),
+                      SizedBox(height: 4),
+                      Text('Protein: ${recipe['protein'] ?? 'N/A'}g'),
+                      SizedBox(height: 4),
+                      Text('Fat: ${recipe['fat'] ?? 'N/A'}g'),
+                      SizedBox(height: 10),
+                      Text(
+                        'Description:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(recipe['description'] ?? 'No description provided.'),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
     );
   }
+
 
 
   @override
