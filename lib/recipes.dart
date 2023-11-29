@@ -120,8 +120,29 @@ class _RecipesPageState extends State<RecipesPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                       // Assuming your data is a Map
                       Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -183,8 +204,29 @@ class _RecipesPageState extends State<RecipesPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         // Assuming your data is a Map
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -246,8 +288,29 @@ class _RecipesPageState extends State<RecipesPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         // Assuming your data is a Map
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
