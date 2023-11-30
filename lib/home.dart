@@ -31,9 +31,9 @@ class AuthService {
   }
 
 // Method to check if the currently signed-in user is an admin
-
-
 }
+
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -163,15 +163,31 @@ class _HomePageState extends State<HomePage> {
   double _calculateTotalKcalValue(double? weight, double? height, double? age) {
     return 88.362 + (13.397 * (weight ?? 0)) + (4.799 * (height ?? 0)) - (5.677 * (age ?? 0));
   }
-  void refreshHomePage() {
+  void refreshHomePage() async {
     // Add logic to refresh the data
     // For example:
     // fetchDataFromDatabase();
     // You might also need to call setState to update the UI
     print("Button Pressed");
     print(kcalEatenValue);
-    setState(() {
 
+
+
+    Map<String, dynamic> savedData = await PreferencesService().loadData();
+    isAdmin = savedData['isAdmin'];
+    mealtype = savedData['mealType'];
+    eatenBreakfast = savedData['eatenBreakfast'];
+    eatenCarbs= savedData['eatenCarbs'];
+    eatenFat= savedData['eatenFat'];
+    eatenProtein= savedData['eatenProtein'];
+    kcalEatenValue= savedData['kcalEatenValue'];
+    kcalLeftValue=savedData['kcalLeftValue'];
+    kcalTotalValue= savedData['kcalTotalValue'];
+    totalProtein=savedData['totalProtein'];
+
+
+
+    setState(() {
       // Update state variables if necessary
     });
   }

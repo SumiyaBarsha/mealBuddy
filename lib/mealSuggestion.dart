@@ -300,6 +300,18 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                       eatenBreakfast=recipe['title'];
                       print(eatenBreakfast);
                     }
+                    PreferencesService().saveData(
+                        isAdmin: isAdmin,
+                        mealType: mealtype,
+                        eatenBreakfast: eatenBreakfast,
+                        eatenCarbs: eatenCarbs,
+                        eatenFat: eatenFat,
+                        eatenProtein: eatenProtein,
+                        kcalEatenValue: kcalEatenValue,
+                        kcalLeftValue: kcalLeftValue,
+                        kcalTotalValue: kcalTotalValue,
+                        totalProtein: totalProtein
+                    );
                   },
                 ),
                 TextButton(
