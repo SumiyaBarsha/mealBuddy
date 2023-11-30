@@ -31,9 +31,9 @@ class AuthService {
   }
 
 // Method to check if the currently signed-in user is an admin
-
-
 }
+
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -83,11 +83,13 @@ class _HomePageState extends State<HomePage> {
           double? weight = _parseDouble(userData['weight']);
           double? height = _parseDouble(userData['height']);
           double? age = _parseDouble(userData['age']);
-          // Calculate kcalLeftValue and update state
+          // Calculate kcalTotalValue and update state
           setState(() {
-            kcalLeftValue = _calculateKcalLeftValue(weight, height, age);
+            kcalTotalValue = _calculateTotalKcalValue(weight, height, age);
+            totalProtein = weight*.9;
+            print(totalProtein);
           });
-          print(kcalLeftValue);
+          print(kcalTotalValue);
         } else {
           print("User data not found.");
         }
@@ -158,9 +160,38 @@ class _HomePageState extends State<HomePage> {
     return value != null ? double.tryParse(value) ?? 0.0 : 0.0;
   }
 
-  double _calculateKcalLeftValue(double? weight, double? height, double? age) {
+  double _calculateTotalKcalValue(double? weight, double? height, double? age) {
     return 88.362 + (13.397 * (weight ?? 0)) + (4.799 * (height ?? 0)) - (5.677 * (age ?? 0));
   }
+  void refreshHomePage() async {
+    // Add logic to refresh the data
+    // For example:
+    // fetchDataFromDatabase();
+    // You might also need to call setState to update the UI
+    print("Button Pressed");
+    print(kcalEatenValue);
+
+
+
+    Map<String, dynamic> savedData = await PreferencesService().loadData();
+    isAdmin = savedData['isAdmin'];
+    mealtype = savedData['mealType'];
+    eatenBreakfast = savedData['eatenBreakfast'];
+    eatenCarbs= savedData['eatenCarbs'];
+    eatenFat= savedData['eatenFat'];
+    eatenProtein= savedData['eatenProtein'];
+    kcalEatenValue= savedData['kcalEatenValue'];
+    kcalLeftValue=savedData['kcalLeftValue'];
+    kcalTotalValue= savedData['kcalTotalValue'];
+    totalProtein=savedData['totalProtein'];
+
+
+
+    setState(() {
+      // Update state variables if necessary
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,6 +243,14 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ),
+                    IconButton(
+                      icon: Icon(Icons.refresh),
+                      color: Colors.white,
+                      onPressed: () {
+                        // Call the method to refresh the page
+                        refreshHomePage();
+                      },
+                    ),
                   ],
                 ),
 
@@ -220,16 +259,16 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     CircleValue(
-                      label: 'Eaten',
-                      value: eatenValue,
-                    ),
-                    CircleValue(
                       label: 'Kcal Left',
-                      value: kcalLeftValue,
+                      value: kcalTotalValue-kcalEatenValue,
                     ),
                     CircleValue(
-                      label: 'Burned',
-                      value: burnedValue,
+                      label: 'Total Kcal',
+                      value: kcalTotalValue,
+                    ),
+                    CircleValue(
+                      label: 'Kcal Eaten',
+                      value: kcalEatenValue,
                     ),
                   ],
                 ),
@@ -274,16 +313,28 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        NutritionInfo(title: 'Carbs', value: _carbsValue ?? ''),
+                        NutritionInfo(
+                          title: 'Carbs',
+                          value1: eatenCarbs, // Replace with actual double value
+                          value2: kcalTotalValue/7, // Replace with actual double value
+                        ),
                         Divider(),
                         NutritionInfo(
-                            title: 'Protein', value: _proteinValue ?? ''),
+                          title: 'Protein',
+                          value1: eatenProtein, // Replace with actual double value
+                          value2: totalProtein, // Replace with actual double value
+                        ),
                         Divider(),
-                        NutritionInfo(title: 'Fat', value: _fatValue ?? ''),
+                        NutritionInfo(
+                          title: 'Fat',
+                          value1: eatenFat, // Replace with actual double value
+                          value2: kcalTotalValue/30, // Replace with actual double value
+                        ),
                       ],
                     ),
                   ),
                 ),
+
 
                 // Sixth Row: Water Section (Glasses of Water)
                 Card(
@@ -381,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                         child: MealCard(
                           title: 'Breakfast',
                           imageUrl: 'images/breakfast.png',
-                          calorieRange: 'Recommended 255 - 383 kcal',
+                          calorieRange: eatenBreakfast,
                         ),
                       ),
                       Divider(),
@@ -571,9 +622,14 @@ class CircleValue extends StatelessWidget {
 
 class NutritionInfo extends StatelessWidget {
   final String title;
-  final String value;
+  final double value1;
+  final double value2;
 
-  NutritionInfo({required this.title, required this.value});
+  NutritionInfo({
+    required this.title,
+    required this.value1,
+    required this.value2,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -583,10 +639,13 @@ class NutritionInfo extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
         ),
         Text(
-          value,
+          "${value1.toStringAsFixed(2)} / ${value2.toStringAsFixed(2)}",
           style: TextStyle(fontSize: 18),
         ),
       ],

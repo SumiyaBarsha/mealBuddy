@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'globals.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:math';
 
 class MealSuggestionPage extends StatefulWidget {
   @override
@@ -173,7 +174,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
               print('Unexpected type for kcal in recipe ${recipe['title']}');
               kcal = 0.0; // Default value for unexpected type
             }
-            kcal=kcalLeftValue*4/15-kcal;
+            kcal=kcalTotalValue*4/15-kcal;
             if(kcal<0){
               kcal=-kcal;
             }
@@ -196,7 +197,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
               print('Unexpected type for kcal in recipe ${recipe['title']}');
               kcal = 0.0; // Default value for unexpected type
             }
-            kcal=kcalLeftValue*3/15-kcal;
+            kcal=kcalTotalValue*3/15-kcal;
             if(kcal<0){
               kcal=-kcal;
             }
@@ -220,7 +221,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
               print('Unexpected type for kcal in recipe ${recipe['title']}');
               kcal = 0.0; // Default value for unexpected type
             }
-            kcal=kcalLeftValue*5/15-kcal;
+            kcal=kcalTotalValue*5/15-kcal;
             if(kcal<0){
               kcal=-kcal;
             }
@@ -285,8 +286,38 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                   ),
                 ),
                 TextButton(
+                  child: Text('select'),
+                  onPressed: () {
+                    print('pressed1');
+                    kcalEatenValue=kcalEatenValue+(double.parse(recipe['kcal']));
+                    eatenCarbs=eatenCarbs+double.parse(recipe['carbs']);
+                    eatenFat=eatenFat+double.parse(recipe['fat']);
+                    eatenProtein=eatenProtein+double.parse(recipe['protein']);
+                    print(kcalEatenValue);
+                    subtractIngredientsFromGrocery(recipe['recipe']['ingredients']);
+                    if(mealtype=='breakfast'){
+                      print(eatenBreakfast);
+                      eatenBreakfast=recipe['title'];
+                      print(eatenBreakfast);
+                    }
+                    PreferencesService().saveData(
+                        isAdmin: isAdmin,
+                        mealType: mealtype,
+                        eatenBreakfast: eatenBreakfast,
+                        eatenCarbs: eatenCarbs,
+                        eatenFat: eatenFat,
+                        eatenProtein: eatenProtein,
+                        kcalEatenValue: kcalEatenValue,
+                        kcalLeftValue: kcalLeftValue,
+                        kcalTotalValue: kcalTotalValue,
+                        totalProtein: totalProtein
+                    );
+                  },
+                ),
+                TextButton(
                   child: Text('Close'),
                   onPressed: () {
+                    print('pressed2');
                     Navigator.of(context).pop();
                   },
                 ),
@@ -297,6 +328,60 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
       },
     );
   }
+
+
+
+
+
+
+
+  Future<void> subtractIngredientsFromGrocery(List<dynamic> ingredients) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print('No user logged in');
+      return;
+    }
+
+    String userId = user.uid;
+    DatabaseReference itemsRef = FirebaseDatabase.instance.ref('Users/$userId/GroceryItems');
+
+    for (var entry in ingredients) {
+      // Assuming each entry has 'name' and 'amount' keys
+
+      if(entry is Map){
+        print("YES");
+      }
+      print(entry);
+
+      String ingredientName = entry['name'];
+      double quantityToSubtract = double.tryParse(entry['amount'].toString()) ?? 0.0;
+      print(ingredientName);
+      print(quantityToSubtract);
+
+      Query query = itemsRef.orderByChild('name').equalTo(ingredientName);
+      await query.once().then((DatabaseEvent event) async {
+         if (event.snapshot.exists) {
+           Map<dynamic, dynamic> items = Map<dynamic, dynamic>.from(event.snapshot.value as Map);
+           String itemKey = items.keys.first; // Assuming there's only one item with this name
+           var amount = items[itemKey]['amount'];
+           double existingAmount = (amount is int) ? amount.toDouble() : amount as double;
+           double newAmount = max(0, existingAmount - quantityToSubtract);
+
+           await itemsRef.child(itemKey).update({'amount': newAmount});
+         }
+       }).catchError((error) {
+         print("Failed to subtract ingredient: $error");
+       });
+    }
+
+    // Be careful with this line - make sure the context is still valid
+    Navigator.of(context).pop();
+  }
+
+
+
+
+
 
 
   @override
@@ -352,8 +437,29 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
                         // Filter items based on whether their title matches any in vectorOfPairs
@@ -420,8 +526,29 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
                         // Filter items based on whether their title matches any in vectorOfPairs
@@ -488,8 +615,29 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
                         // Filter items based on whether their title matches any in vectorOfPairs
@@ -561,6 +709,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
           'protein': protein,
           'carbs': carbs,
           'description': sub,
+          'recipe': recipe,
         });
         print('Card tapped!');
       },
