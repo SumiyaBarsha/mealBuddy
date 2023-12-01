@@ -161,6 +161,7 @@ class _HomePageState extends State<HomePage> {
   double _calculateKcalLeftValue(double? weight, double? height, double? age) {
     return 88.362 + (13.397 * (weight ?? 0)) + (4.799 * (height ?? 0)) - (5.677 * (age ?? 0));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

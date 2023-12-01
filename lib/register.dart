@@ -255,6 +255,15 @@ class _RegisterState extends State<Register> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () async {
+          final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+          if (!emailRegex.hasMatch(emailController.text)) {
+            // If email format is not valid, show a snackbar with an error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Please enter a valid email address.")),
+            );
+            return; // Stop the function execution
+          }
           if (passwordController.text == confirmPasswordController.text) {
             try {
               UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -300,7 +309,9 @@ class _RegisterState extends State<Register> {
               // Display an error message to the user
             }
           } else {
-            // Display an error message if passwords don't match
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Password didn't match.Try again!")),
+            );
           }
         },
         style: ElevatedButton.styleFrom(
