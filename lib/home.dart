@@ -194,6 +194,8 @@ class _HomePageState extends State<HomePage> {
     eatenProtein= savedData['eatenProtein'];
     kcalEatenValue= savedData['kcalEatenValue'];
     kcalLeftValue=savedData['kcalLeftValue'];
+    isAdmin=savedData['isAdmin'];
+    filledGlasses=savedData['filledGlasses'];
 
 
     setState(() {
@@ -372,6 +374,19 @@ class _HomePageState extends State<HomePage> {
                                 if (index == filledGlasses) {
                                   setState(() {
                                     filledGlasses++;
+                                    PreferencesService().saveData(
+                                      mealType: mealtype,
+                                      eatenBreakfast: eatenBreakfast,
+                                      eatenDinner: eatenDinner,
+                                      eatenLunch: eatenLunch,
+                                      eatenCarbs: eatenCarbs,
+                                      eatenFat: eatenFat,
+                                      eatenProtein: eatenProtein,
+                                      kcalEatenValue: kcalEatenValue,
+                                      kcalLeftValue: kcalLeftValue,
+                                      isAdmin: isAdmin,
+                                      filledGlasses: filledGlasses,
+                                    );
                                   });
                                 }
                               },
