@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class _RegisterState extends State<Register> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref().child("Users");
+  bool _isLoading = false;
 
   // Controllers for input fields
   final TextEditingController emailController = TextEditingController();
@@ -255,7 +257,27 @@ class _RegisterState extends State<Register> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () async {
+          final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+                  if (!emailRegex.hasMatch(emailController.text)) {
+                    Fluttertoast.showToast(msg: "Please enter a valid email address.");
+                  }
+
+                  if (passwordController.text.length < 6) {
+                    Fluttertoast.showToast(msg: "Password must be at least 6 characters.");
+                  }
+
+          var connectivityResult = await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.none) {
+            // No internet connection
+            Fluttertoast.showToast(msg: "Connection lost. Please check your internet connection.");
+            return;
+          }
+
           if (passwordController.text == confirmPasswordController.text) {
+            setState(() {
+              _isLoading = true; // Start loading
+            });
             try {
               UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
                 email: emailController.text,
@@ -273,34 +295,21 @@ class _RegisterState extends State<Register> {
                   'gender' : genderController.text,
                   'dob': DateTime(1990, 1, 1),
                 });
-                await showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Registration'),
-                      content: Text('Registration successful!'),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text('OK'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
+                Fluttertoast.showToast(msg: "Successfully Registered!");
 
                 Navigator.pop(context,
                   MaterialPageRoute(builder: (context) => Login()),
                 );
               }
             } catch (e) {
-              print(e); // Print the exception for debugging
-              // Display an error message to the user
+              print(e);
+            }finally {
+              setState(() {
+                _isLoading = false; // Stop loading
+              });
             }
           } else {
-            // Display an error message if passwords don't match
+            Fluttertoast.showToast(msg: "Password didn't match.Try again!");
           }
         },
         style: ElevatedButton.styleFrom(
@@ -310,7 +319,9 @@ class _RegisterState extends State<Register> {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: Text(
+        child: _isLoading ? CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ) : Text(
           'Register',
           style: TextStyle(
             color: Colors.white,
@@ -324,8 +335,10 @@ class _RegisterState extends State<Register> {
   Widget buildHaveAccountText() {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context);
-      },
+      Navigator.pop(context,
+        MaterialPageRoute(builder: (context) => Login()),
+      );
+    },
       child: Text(
         'Already have an account?',
         style: TextStyle(

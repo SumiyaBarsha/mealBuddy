@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:meal_recommender/groceriesPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_recommender/recipes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'mealSuggestion.dart';
 import 'globals.dart';
 import 'AdminRecipePage.dart';
@@ -27,6 +28,9 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userEmail');
+    await prefs.remove('isAdmin');
     return _firebaseAuth.signOut();
   }
 

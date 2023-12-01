@@ -49,6 +49,8 @@ dependencies:
   flutter_timezone: ^1.0.8
   intl: ^0.18.1
   rxdart: ^0.27.7
+  connectivity_plus: ^2.0.2
+  fluttertoast: ^8.0.8
 
 
 

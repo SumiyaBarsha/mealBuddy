@@ -149,9 +149,10 @@ Future<void> _deleteAccount(BuildContext context) async {
   // If the user confirmed, proceed with account deletion
   if (confirmDelete == true) {
     await user?.delete();
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => Login()),
+          (Route<dynamic> route) => false, // Removes all previous routes
     );
   }
 }
