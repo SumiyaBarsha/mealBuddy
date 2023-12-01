@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meal_recommender/globals.dart';
 import 'package:meal_recommender/home.dart';
 import 'package:meal_recommender/register.dart';
@@ -65,6 +66,8 @@ class _LoginState extends State<Login> {
                       buildEmail(),
                       SizedBox(height: 20),
                       buildPassword(),
+                      SizedBox(height: 20),
+                      buildForgotPasswordButton(context),
                       SizedBox(height: 20),
                       buildLoginBtn(context),
                       SizedBox(height: 20),
@@ -168,7 +171,7 @@ class _LoginState extends State<Login> {
               setState(() {
                 _isLoading = true;
               });
-              print("HERE");
+             // print("HERE");
 
               try {
                 UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -182,12 +185,24 @@ class _LoginState extends State<Login> {
                   }
                   else isAdmin=true;
                   print(isAdmin);
+                  Fluttertoast.showToast(msg: "Logged in successfully!");
                   _navigateToHomePage(context);
+                }else {
+                  Fluttertoast.showToast(msg: "Wrong user credentials! Please try again.");
+                }
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'user-not-found') {
+                  Fluttertoast.showToast(msg: "No user found for that email.");
+                } else if (e.code == 'wrong-password') {
+                  Fluttertoast.showToast(msg: "Wrong password provided for that user.");
+                } else {
+                  Fluttertoast.showToast(msg: "Login failed: ${e.message}");
                 }
               } catch (e) {
                 print(e);
                 // You can show a dialog or snackbar here to inform the user about the error
-              } finally {
+              }
+              finally {
                 setState(() {
                   _isLoading = false;
                 });
@@ -213,6 +228,33 @@ class _LoginState extends State<Login> {
         ],
       ),
     );
+  }
+  Widget buildForgotPasswordButton(BuildContext context) {
+    return TextButton(
+      onPressed: () => _showResetPasswordDialog(context),
+      child: Text(
+        'Forgot Password?',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+
+  Future<void> _resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password reset email sent")),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error sending password reset email")),
+      );
+    }
   }
 
 
@@ -269,4 +311,38 @@ class _LoginState extends State<Login> {
       ),
     );
   }
+
+  void _showResetPasswordDialog(BuildContext context) {
+    TextEditingController emailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Reset Password'),
+          content: TextField(
+            controller: emailController,
+            decoration: InputDecoration(hintText: "Email"),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Send'),
+              onPressed: () {
+                // Call a method to send reset password email
+                _resetPassword(emailController.text);
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

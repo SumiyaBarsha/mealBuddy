@@ -84,7 +84,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               },
             ),
             SizedBox(width: 3.0),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(200, 50),
+                maximumSize: Size(200, 50),
+              ),
               child: Text('Save'),
               onPressed: () {
                 setState(() {

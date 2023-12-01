@@ -136,22 +136,26 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
                 ? Image.file(
               File(_image!.path),
               width: double.infinity,
-              // Set image width to match the screen width
               height: 200,
-              // Fixed height for the image
-              fit: BoxFit.cover, // Cover the entire widget area
+              fit: BoxFit.cover,
             )
-                : Placeholder(
-                fallbackHeight: 200, fallbackWidth: double.infinity),
-            SizedBox(height: 20), // Added some space before the button
-            ElevatedButton(
-              child: Text(
-                  'Choose Image', style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.green, // background
-                onPrimary: Colors.white, // text color
+                : Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
               ),
-              onPressed: chooseFile,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.camera_alt, size: 50, color: Colors.grey[600]),
+                  Text(
+                    'Tap the button to select an image',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: 10), // Added some space between buttons
             ElevatedButton(

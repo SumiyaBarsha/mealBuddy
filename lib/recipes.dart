@@ -22,56 +22,59 @@ class _RecipesPageState extends State<RecipesPage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Use as little space as necessary
-            children: <Widget>[
-              Image.network(
-                recipe['image'] ?? 'https://via.placeholder.com/150',
-                height: 200, // Fixed height for the image
-                width: double.infinity, // Image takes the full width of the dialog
-                fit: BoxFit.cover,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      recipe['title'] ?? 'Recipe Title',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.0,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text('Carbohydrates: ${recipe['carbs'] ?? 'N/A'}g'),
-                    SizedBox(height: 4),
-                    Text('Protein: ${recipe['protein'] ?? 'N/A'}g'),
-                    SizedBox(height: 4),
-                    Text('Fat: ${recipe['fat'] ?? 'N/A'}g'),
-                    SizedBox(height: 10),
-                    Text(
-                      'Description:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(recipe['recipe'] ?? 'No description provided.'),
-                  ],
+          child: SingleChildScrollView( // Wrap the content in a SingleChildScrollView
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Use as little space as necessary
+              children: <Widget>[
+                Image.network(
+                  recipe['image'] ?? 'https://via.placeholder.com/150',
+                  height: 200, // Fixed height for the image
+                  width: double.infinity, // Image takes the full width of the dialog
+                  fit: BoxFit.cover,
                 ),
-              ),
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        recipe['title'] ?? 'Recipe Title',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24.0,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text('Carbohydrates: ${recipe['carbs'] ?? 'N/A'}g'),
+                      SizedBox(height: 4),
+                      Text('Protein: ${recipe['protein'] ?? 'N/A'}g'),
+                      SizedBox(height: 4),
+                      Text('Fat: ${recipe['fat'] ?? 'N/A'}g'),
+                      SizedBox(height: 10),
+                      Text(
+                        'Description:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(recipe['description'] ?? 'No description provided.'),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
     );
   }
+
 
 
   @override
@@ -117,8 +120,29 @@ class _RecipesPageState extends State<RecipesPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                       // Assuming your data is a Map
                       Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -139,7 +163,12 @@ class _RecipesPageState extends State<RecipesPage> {
                             return buildCard(
                               recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                               recipe['title'] ?? 'Recipe Title',
-                              'Carbs' + recipe['carbs'], // add X Kcal here ,not carb
+                              recipe['carbs'],
+                              recipe['kcal'].toString(),
+                              recipe['fat'],
+                              recipe['protein'],
+
+                              recipe['recipe'],
                             );
                           },
                         ),
@@ -175,8 +204,29 @@ class _RecipesPageState extends State<RecipesPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         // Assuming your data is a Map
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -197,7 +247,11 @@ class _RecipesPageState extends State<RecipesPage> {
                               return buildCard(
                                 recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                                 recipe['title'] ?? 'Recipe Title',
-                                'Carbs' + recipe['carbs'],
+                                recipe['carbs'],
+                                recipe['kcal'].toString(),
+                                recipe['fat'],
+                                recipe['protein'],
+                                recipe['recipe'],
                               );
                             },
                           ),
@@ -234,8 +288,29 @@ class _RecipesPageState extends State<RecipesPage> {
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Display a loading indicator while waiting
+                        return Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
+                                SizedBox(height: 20),
+                                Text("Loading, please wait...",
+                                    style: TextStyle(fontSize: 16, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        );
                       }
+
                       if (snapshot.data?.snapshot.value != null) {
                         // Assuming your data is a Map
                         Map recipes = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -256,7 +331,12 @@ class _RecipesPageState extends State<RecipesPage> {
                               return buildCard(
                                 recipe['image'] ?? 'https://via.placeholder.com/150', // Provide a default image in case 'image' is null
                                 recipe['title'] ?? 'Recipe Title',
-                                'Carbs' + recipe['carbs'],
+                                recipe['carbs'],
+                                recipe['kcal'].toString(),
+                                recipe['fat'],
+                                recipe['protein'],
+                                recipe['recipe'],
+
                               );
                             },
                           ),
@@ -280,16 +360,22 @@ class _RecipesPageState extends State<RecipesPage> {
     );
   }
 
-  Widget buildCard(String imageUrl, String title, String subtitle) {
+  Widget buildCard(String imageUrl, String title, String carbs, String kcal, String fat, String protein,String sub) {
     return InkWell(
       onTap: () {
         // You would need to pass the actual recipe Map data here
         showRecipeDetails({
           'image': imageUrl,
           'title': title,
+          'kcal': kcal,
+          'fat': fat,
+          'protein': protein,
+          'carbs': carbs,
+          'description': sub,
           // Add other recipe details here as needed
         });
         print('Card tapped!');
+
       },
       child: Card(
         margin: EdgeInsets.all(8.0),
@@ -310,7 +396,7 @@ class _RecipesPageState extends State<RecipesPage> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(subtitle),
+                child: Text('kcal: '+kcal),
               ),
             ],
           ),

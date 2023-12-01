@@ -127,11 +127,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userEmail');
     await prefs.remove('isAdmin');
-
+    await AuthService().signOut();
     // Redirect to the login page
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (context) => Login(),
-    ));
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => Login()),
+          (Route<dynamic> route) => false, // Removes all previous routes
+    );
   }
 
 
@@ -302,4 +304,23 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+class AuthService {
+final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+final FirebaseDatabase _database = FirebaseDatabase.instance;
+
+
+Future<void> signOut() async {
+// Clear user session data when signing out
+final prefs = await SharedPreferences.getInstance();
+await prefs.remove('userEmail');
+await prefs.remove('isAdmin');
+// Add any other prefs keys that you use in the app
+
+return _firebaseAuth.signOut();
+}
+
+// Method to check if the currently signed-in user is an admin
+// ... rest of the AuthService class ...
 }
