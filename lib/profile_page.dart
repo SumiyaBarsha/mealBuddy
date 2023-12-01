@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:meal_recommender/personalDetail2.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'globals.dart';
 
 enum Goal { Gain, Maintain, Lose }
 
@@ -126,9 +127,11 @@ class _ProfilePageState extends State<ProfilePage> {
     await prefs.remove('isAdmin');
 
     // Redirect to the login page
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (context) => Login(),
-    ));
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => Login()),
+          (Route<dynamic> route) => false, // Removes all previous routes
+    );
   }
 
 
