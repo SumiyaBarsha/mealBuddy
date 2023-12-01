@@ -178,7 +178,6 @@ class _HomePageState extends State<HomePage> {
 
 
     Map<String, dynamic> savedData = await PreferencesService().loadData();
-    isAdmin = savedData['isAdmin'];
     mealtype = savedData['mealType'];
     eatenBreakfast = savedData['eatenBreakfast'];
     eatenCarbs= savedData['eatenCarbs'];
@@ -186,9 +185,6 @@ class _HomePageState extends State<HomePage> {
     eatenProtein= savedData['eatenProtein'];
     kcalEatenValue= savedData['kcalEatenValue'];
     kcalLeftValue=savedData['kcalLeftValue'];
-    kcalTotalValue= savedData['kcalTotalValue'];
-    totalProtein=savedData['totalProtein'];
-
 
 
     setState(() {

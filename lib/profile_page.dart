@@ -12,6 +12,7 @@ import 'package:meal_recommender/personalDetail2.dart';
 import 'dart:io';
 import 'notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'globals.dart';
 
 enum Goal { Gain, Maintain, Lose }
 

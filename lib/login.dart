@@ -183,9 +183,24 @@ class _LoginState extends State<Login> {
                   if(emailController.text=='admin@gmail.com'){
                     isAdmin=true;
                   }
-                  else isAdmin=true;
-                  print(isAdmin);
+                  else isAdmin=false;
                   Fluttertoast.showToast(msg: "Logged in successfully!");
+                  mealtype='breakfast';
+                  eatenBreakfast='Recommended 255 - 383 kcal';
+                  eatenCarbs=0.0;
+                  eatenFat=0.0;
+                  eatenProtein=0.0;
+                  kcalEatenValue=0.0;
+                  kcalLeftValue=0.0;
+                  PreferencesService().saveData(
+                    mealType: mealtype,
+                    eatenBreakfast: eatenBreakfast,
+                    eatenCarbs: eatenCarbs,
+                    eatenFat: eatenFat,
+                    eatenProtein: eatenProtein,
+                    kcalEatenValue: kcalEatenValue,
+                    kcalLeftValue: kcalLeftValue,
+                  );
                   _navigateToHomePage(context);
                 }else {
                   Fluttertoast.showToast(msg: "Wrong user credentials! Please try again.");

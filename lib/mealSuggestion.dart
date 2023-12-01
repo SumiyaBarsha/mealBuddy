@@ -301,7 +301,6 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                       print(eatenBreakfast);
                     }
                     PreferencesService().saveData(
-                        isAdmin: isAdmin,
                         mealType: mealtype,
                         eatenBreakfast: eatenBreakfast,
                         eatenCarbs: eatenCarbs,
@@ -309,8 +308,6 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                         eatenProtein: eatenProtein,
                         kcalEatenValue: kcalEatenValue,
                         kcalLeftValue: kcalLeftValue,
-                        kcalTotalValue: kcalTotalValue,
-                        totalProtein: totalProtein
                     );
                   },
                 ),
@@ -344,42 +341,109 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
 
     String userId = user.uid;
     DatabaseReference itemsRef = FirebaseDatabase.instance.ref('Users/$userId/GroceryItems');
-
+    bool okk=true;
     for (var entry in ingredients) {
       // Assuming each entry has 'name' and 'amount' keys
 
-      if(entry is Map){
-        print("YES");
-      }
-      print(entry);
-
       String ingredientName = entry['name'];
       double quantityToSubtract = double.tryParse(entry['amount'].toString()) ?? 0.0;
-      print(ingredientName);
-      print(quantityToSubtract);
 
       Query query = itemsRef.orderByChild('name').equalTo(ingredientName);
+      bool ok = true;
       await query.once().then((DatabaseEvent event) async {
-         if (event.snapshot.exists) {
-           Map<dynamic, dynamic> items = Map<dynamic, dynamic>.from(event.snapshot.value as Map);
-           String itemKey = items.keys.first; // Assuming there's only one item with this name
-           var amount = items[itemKey]['amount'];
-           double existingAmount = (amount is int) ? amount.toDouble() : amount as double;
-           double newAmount = max(0, existingAmount - quantityToSubtract);
-
-           await itemsRef.child(itemKey).update({'amount': newAmount});
-         }
-       }).catchError((error) {
-         print("Failed to subtract ingredient: $error");
-       });
+        if (event.snapshot.exists) {
+          Map<dynamic, dynamic> items = Map<dynamic, dynamic>.from(event.snapshot.value as Map);
+          String itemKey = items.keys.first; // Assuming there's only one item with this name
+          var amount = items[itemKey]['amount'];
+          double existingAmount = (amount is int) ? amount.toDouble() : amount as double;
+          if(quantityToSubtract>existingAmount){
+            ok=false;
+          }
+        }
+        else{
+          ok=false;
+        }
+      }).catchError((error) {
+        print("Failed to subtract ingredient: $error");
+      });
+      if(ok==false){
+        // Show dialog and wait for the user's response
+        bool shouldContinue = await showConfirmationDialog(context, 'You do not have enough $ingredientName. Do you want to continue?');
+        if (!shouldContinue) {
+          return; // Exit the function early if the user chooses 'No'
+        }
+      }
+      if(ok==false)okk=false;
     }
 
+    if(okk==true){
+      for (var entry in ingredients) {
+
+
+        String ingredientName = entry['name'];
+        double quantityToSubtract = double.tryParse(entry['amount'].toString()) ?? 0.0;
+
+
+        Query query = itemsRef.orderByChild('name').equalTo(ingredientName);
+        await query.once().then((DatabaseEvent event) async {
+          if (event.snapshot.exists) {
+            Map<dynamic, dynamic> items = Map<dynamic, dynamic>.from(event.snapshot.value as Map);
+            String itemKey = items.keys.first; // Assuming there's only one item with this name
+            var amount = items[itemKey]['amount'];
+            double existingAmount = (amount is int) ? amount.toDouble() : amount as double;
+            double newAmount = max(0, existingAmount - quantityToSubtract);
+
+            await itemsRef.child(itemKey).update({'amount': newAmount});
+          }
+        }).catchError((error) {
+          print("Failed to subtract ingredient: $error");
+        });
+      }
+      await showUpdateConfirmationDialog(context);
+    }
     // Be careful with this line - make sure the context is still valid
     Navigator.of(context).pop();
   }
 
 
+  Future<void> showUpdateConfirmationDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Update Successful'),
+        content: Text('The ingredients have been updated successfully.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
+
+
+
+  Future<bool> showConfirmationDialog(BuildContext context, String message) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Not Enough Ingredients'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // User chooses 'Yes'
+            child: Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // User chooses 'No'
+            child: Text('No'),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
 
 
 
