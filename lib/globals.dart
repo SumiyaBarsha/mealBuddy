@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 bool isAdmin= false;
-String mealtype= 'breakfast',eatenBreakfast='Recommended 255 - 383 kcal';
+String mealtype= 'breakfast',eatenBreakfast='Recommended 255 - 383 kcal',eatenLunch='Recommended 383 - 510 kcal',eatenDinner='Recommended 383 - 510 kcal';
 double kcalLeftValue = 0.0, kcalTotalValue = 0.0, kcalEatenValue = 0.0, eatenFat=0.0 , eatenCarbs=0.0 , eatenProtein=0.0 , totalProtein=0.0;
 
 class PreferencesService {
@@ -20,6 +20,8 @@ class PreferencesService {
   Future<void> saveData({
     required String mealType,
     required String eatenBreakfast,
+    required String eatenLunch,
+    required String eatenDinner,
     required double kcalLeftValue,
     required double kcalEatenValue,
     required double eatenFat,
@@ -30,6 +32,8 @@ class PreferencesService {
 
     await prefs.setString('mealType', mealType);
     await prefs.setString('eatenBreakfast', eatenBreakfast);
+    await prefs.setString('eatenLunch', eatenLunch);
+    await prefs.setString('eatenDinner', eatenDinner);
     await prefs.setDouble('kcalLeftValue', kcalLeftValue);
     await prefs.setDouble('kcalEatenValue', kcalEatenValue);
     await prefs.setDouble('eatenFat', eatenFat);
@@ -43,6 +47,8 @@ class PreferencesService {
     return {
       'mealType': prefs.getString('mealType') ?? 'breakfast',
       'eatenBreakfast': prefs.getString('eatenBreakfast') ?? 'Recommended 255 - 383 kcal',
+      'eatenLunch': prefs.getString('eatenLunch') ?? 'Recommended 383 - 510 kcal',
+      'eatenDinner': prefs.getString('eatenDinner') ?? 'Recommended 383 - 510 kcal',
       'kcalLeftValue': prefs.getDouble('kcalLeftValue') ?? 0.0,
       'kcalEatenValue': prefs.getDouble('kcalEatenValue') ?? 0.0,
       'eatenFat': prefs.getDouble('eatenFat') ?? 0.0,
@@ -57,6 +63,8 @@ class PreferencesService {
     await prefsService.saveData(
       mealType: 'breakfast',
       eatenBreakfast: 'Recommended 255 - 383 kcal',
+      eatenLunch: 'Recommended 255 - 383 kcal',
+      eatenDinner: 'Recommended 255 - 383 kcal',
       kcalLeftValue: 0.0,
       kcalEatenValue: 0.0,
       eatenFat: 0.0,

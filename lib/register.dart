@@ -228,6 +228,10 @@ class _RegisterState extends State<Register> {
     );
   }
 
+
+  // Making genderValue nullable
+  String? genderValue;
+
   Widget buildGenderField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,16 +244,36 @@ class _RegisterState extends State<Register> {
             color: Colors.black,
           ),
         ),
-        TextFormField(
-          controller: genderController,
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            hintText: 'Enter your gender',
-          ),
+        RadioListTile<String>(
+          title: const Text('Male'),
+          value: 'male',
+          groupValue: genderValue,
+          onChanged: (value) {
+            setState(() {
+              genderValue = value;
+              genderController.text = value ?? ''; // Handle null value
+              print('Selected Gender: $genderValue'); // Debugging log
+            });
+          },
+        ),
+        RadioListTile<String>(
+          title: const Text('Female'),
+          value: 'female',
+          groupValue: genderValue,
+          onChanged: (value) {
+            setState(() {
+              genderValue = value;
+              genderController.text = value ?? ''; // Handle null value
+              print('Selected Gender: $genderValue'); // Debugging log
+            });
+          },
         ),
       ],
     );
   }
+
+
+
 
   Widget buildRegisterButton() {
     return Container(
@@ -283,7 +307,6 @@ class _RegisterState extends State<Register> {
                 email: emailController.text,
                 password: passwordController.text,
               );
-
               // If registration is successful, save additional user data to Firebase Realtime Database
               if (userCredential.user != null) {
                 _dbRef.child(userCredential.user!.uid).set({
@@ -293,7 +316,6 @@ class _RegisterState extends State<Register> {
                   'weight': weightController.text,
                   'age' : ageController.text,
                   'gender' : genderController.text,
-                  'dob': DateTime(1990, 1, 1),
                 });
                 Fluttertoast.showToast(msg: "Successfully Registered!");
 

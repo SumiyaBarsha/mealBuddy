@@ -180,6 +180,8 @@ class _HomePageState extends State<HomePage> {
     Map<String, dynamic> savedData = await PreferencesService().loadData();
     mealtype = savedData['mealType'];
     eatenBreakfast = savedData['eatenBreakfast'];
+    eatenLunch=savedData['eatenLunch'];
+    eatenDinner=savedData['eatenDinner'];
     eatenCarbs= savedData['eatenCarbs'];
     eatenFat= savedData['eatenFat'];
     eatenProtein= savedData['eatenProtein'];
@@ -449,7 +451,7 @@ class _HomePageState extends State<HomePage> {
                         child: MealCard(
                           title: 'Lunch',
                           imageUrl: 'images/lunchbox.png',
-                          calorieRange: 'Recommended 383 - 510 kcal',
+                          calorieRange: eatenLunch,
                         ),
                       ),
                       Divider(),
@@ -466,7 +468,7 @@ class _HomePageState extends State<HomePage> {
                         child: MealCard(
                           title: 'Dinner',
                           imageUrl: 'images/meal.png',
-                          calorieRange: 'Recommended 383 - 510 kcal',
+                          calorieRange: eatenDinner,
                         ),
                       ),
                     ],

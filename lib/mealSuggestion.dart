@@ -153,7 +153,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
       print("No user logged in");
     }
   }
-
+  bool tmp=true;
 
   void loadDataFromFirebase() async {
     _recipesRef.once().then((DatabaseEvent event) {
@@ -241,6 +241,27 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
     }
   }
 
+
+  Future<void> showTopMessage(BuildContext context, String message) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   void showRecipeDetails(Map recipe) {
     showDialog(
       context: context,
@@ -289,26 +310,35 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                   child: Text('select'),
                   onPressed: () {
                     print('pressed1');
-                    kcalEatenValue=kcalEatenValue+(double.parse(recipe['kcal']));
-                    eatenCarbs=eatenCarbs+double.parse(recipe['carbs']);
-                    eatenFat=eatenFat+double.parse(recipe['fat']);
-                    eatenProtein=eatenProtein+double.parse(recipe['protein']);
-                    print(kcalEatenValue);
-                    subtractIngredientsFromGrocery(recipe['recipe']['ingredients']);
+                    tmp=false;
+                    print(mealtype);
+                    print(eatenBreakfast);
                     if(mealtype=='breakfast'){
-                      print(eatenBreakfast);
-                      eatenBreakfast=recipe['title'];
-                      print(eatenBreakfast);
+                      print(1);
+                      if(eatenBreakfast=='Recommended 255 - 383 kcal'){
+                        print(2);
+                        subtractIngredientsFromGrocery(recipe['recipe']['ingredients'],recipe['title'],recipe['kcal'],recipe['carbs'],recipe['fat'],recipe['protein']);
+                      }
+                      else{
+                        showTopMessage(context, "You have already eaten Breakfast.");
+                      }
                     }
-                    PreferencesService().saveData(
-                        mealType: mealtype,
-                        eatenBreakfast: eatenBreakfast,
-                        eatenCarbs: eatenCarbs,
-                        eatenFat: eatenFat,
-                        eatenProtein: eatenProtein,
-                        kcalEatenValue: kcalEatenValue,
-                        kcalLeftValue: kcalLeftValue,
-                    );
+                    if(mealtype=='lunch'){
+                      if(eatenLunch=='Recommended 383 - 510 kcal'){
+                        subtractIngredientsFromGrocery(recipe['recipe']['ingredients'],recipe['title'],recipe['kcal'],recipe['carbs'],recipe['fat'],recipe['protein']);
+                      }
+                      else{
+                        showTopMessage(context, "You have already eaten Lunch.");
+                      }
+                    }
+                    if(mealtype=='dinner'){
+                      if(eatenDinner=='Recommended 383 - 510 kcal'){
+                        subtractIngredientsFromGrocery(recipe['recipe']['ingredients'],recipe['title'],recipe['kcal'],recipe['carbs'],recipe['fat'],recipe['protein']);
+                      }
+                      else{
+                        showTopMessage(context, "You have already eaten Dinner.");
+                      }
+                    }
                   },
                 ),
                 TextButton(
@@ -332,7 +362,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
 
 
 
-  Future<void> subtractIngredientsFromGrocery(List<dynamic> ingredients) async {
+  Future<void> subtractIngredientsFromGrocery(List<dynamic> ingredients, String title,String kcal,String carbs, String fat,String protein) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       print('No user logged in');
@@ -399,10 +429,36 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
           print("Failed to subtract ingredient: $error");
         });
       }
+      if(mealtype=='breakfast'){
+        eatenBreakfast=title;
+      }
+      if(mealtype=='lunch'){
+        eatenLunch=title;
+      }
+      if(mealtype=='dinner'){
+        eatenDinner=title;
+      }
+      kcalEatenValue=kcalEatenValue+(double.parse(kcal));
+      eatenCarbs=eatenCarbs+double.parse(carbs);
+      eatenFat=eatenFat+double.parse(fat);
+      eatenProtein=eatenProtein+double.parse(protein);
+      PreferencesService().saveData(
+        mealType: mealtype,
+        eatenBreakfast: eatenBreakfast,
+        eatenLunch: eatenLunch,
+        eatenDinner: eatenDinner,
+        eatenCarbs: eatenCarbs,
+        eatenFat: eatenFat,
+        eatenProtein: eatenProtein,
+        kcalEatenValue: kcalEatenValue,
+        kcalLeftValue: kcalLeftValue,
+      );
+
       await showUpdateConfirmationDialog(context);
     }
     // Be careful with this line - make sure the context is still valid
     Navigator.of(context).pop();
+
   }
 
 

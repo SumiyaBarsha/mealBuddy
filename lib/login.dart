@@ -195,6 +195,8 @@ class _LoginState extends State<Login> {
                   PreferencesService().saveData(
                     mealType: mealtype,
                     eatenBreakfast: eatenBreakfast,
+                    eatenDinner: eatenDinner,
+                    eatenLunch: eatenLunch,
                     eatenCarbs: eatenCarbs,
                     eatenFat: eatenFat,
                     eatenProtein: eatenProtein,
