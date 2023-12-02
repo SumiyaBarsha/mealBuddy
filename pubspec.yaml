@@ -51,6 +51,7 @@ dependencies:
   rxdart: ^0.27.7
   connectivity_plus: ^2.0.2
   fluttertoast: ^8.0.8
+  background_fetch: ^1.2.1
 
 
 
