@@ -86,3 +86,30 @@ class PreferencesService {
 // Call saveAllData() whenever you need to save these data points.
 
 }
+bool hasDataBeenClearedToday = false;
+
+Future<void> clearDailyData() async {
+  DateTime now = DateTime.now();
+
+  // Check if it's after midnight and if data hasn't been cleared yet
+  if ((now.hour == 0 || !hasDataBeenClearedToday) && now.minute < 15) {  // 15 minutes range to ensure the task runs after midnight
+    final prefs = await SharedPreferences.getInstance();
+
+    // Reset your variables and save them
+    await prefs.setString('mealType', 'breakfast');
+    await prefs.setString('eatenBreakfast', 'Recommended 255 - 383 kcal');
+    await prefs.setString('eatenLunch', 'Recommended 383 - 510 kcal');
+    await prefs.setString('eatenDinner', 'Recommended 383 - 510 kcal');
+    await prefs.setDouble('kcalLeftValue', 0.0);
+    await prefs.setDouble('kcalEatenValue', 0.0);
+    await prefs.setDouble('eatenFat', 0.0);
+    await prefs.setDouble('eatenCarbs', 0.0);
+    await prefs.setDouble('eatenProtein', 0.0);
+    await prefs.setInt('filledGlasses', 0);
+    await prefs.setBool('isAdmin', false);
+
+    hasDataBeenClearedToday = true;  // Mark that the data has been cleared for the day
+  } else if (now.hour > 0) {
+    hasDataBeenClearedToday = false;  // Reset the flag after midnight
+  }
+}
