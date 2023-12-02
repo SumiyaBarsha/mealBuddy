@@ -837,14 +837,16 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
         color: cardColor,  // Use the cardColor determined by ingredient sufficiency
         margin: EdgeInsets.all(8.0),
         child: Container(
-          width: 160, // Adjust the width to fit your design
+          width: 180, // Adjust the width to fit your design
+          // Increase height here, or use null for auto-adjusting height
           child: Column(
+            mainAxisSize: MainAxisSize.min, // This makes the column height adjust to its children
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Image.network(
                 imageUrl,
                 height: 120, // Adjust the height to fit your design
-                width: 160,
+                width: 180,
                 fit: BoxFit.cover,
               ),
               Padding(
