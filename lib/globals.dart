@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-bool isAdmin= false;
+bool isAdmin=false;
 String mealtype= 'breakfast',eatenBreakfast='Recommended 255 - 383 kcal',eatenLunch='Recommended 383 - 510 kcal',eatenDinner='Recommended 383 - 510 kcal';
 double kcalLeftValue = 0.0, kcalTotalValue = 0.0, kcalEatenValue = 0.0, eatenFat=0.0 , eatenCarbs=0.0 , eatenProtein=0.0 , totalProtein=0.0;
 int filledGlasses = 0;

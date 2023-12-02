@@ -226,12 +226,32 @@ Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) a
     'Onion',
     'Chicken',
     'Cheese',
+    'Mixed Berries',
+    'Rice',
+    'Beef',
+    'Mixed Vegetables',
+    'Lentil',
+    'Slit Chickpea',
+    'Cilantro',
+    'Red Chilli',
+    'Coriander',
+    'Prawn',
+    'Basil Leaves',
+    'Tilapia',
+    'Hilsha',
+    'Mutton',
+    'Mustard seeds',
     // ... Add more items here
   ];
   final List<String> itemsL = [
     'Milk',
     'Vegetable Oil',
     'Mayonnaise',
+    'Honey',
+    'Yogurt',
+    'Coconut Milk',
+    'Mustard Oil',
+    'Mustard',
     // ... Add more items here
   ];
   for (String item in itemsKG) {
@@ -306,6 +326,28 @@ class _SelectionScreenState extends State<SelectionScreen> {
     'Onion',
     'Chicken',
     'Cheese',
+    'Honey',
+    'Banana',
+    'Mixed Berries',
+    'Yogurt',
+    'Rice',
+    'Coconut Milk',
+    'Beef',
+    'Mixed Vegetables',
+    'Lentil',
+    'Slit Chickpea',
+    'Cilantro',
+    'Mustard Oil',
+    'Red Chilli',
+    'Coriander',
+    'Prawn',
+    'Basil Leaves',
+    'Tilapia',
+    'Hilsha',
+    'Mustard',
+    'Mutton',
+    'Mustard seeds',
+
     // ... Add more items here
   ];
 

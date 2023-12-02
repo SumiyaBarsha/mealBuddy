@@ -192,6 +192,9 @@ class _LoginState extends State<Login> {
                   eatenProtein=0.0;
                   kcalEatenValue=0.0;
                   kcalLeftValue=0.0;
+                  filledGlasses=0;
+                  eatenLunch='Recommended 383 - 510 kcal';
+                  eatenDinner='Recommended 383 - 510 kcal';
                   PreferencesService().saveData(
                     mealType: mealtype,
                     eatenBreakfast: eatenBreakfast,

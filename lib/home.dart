@@ -194,7 +194,6 @@ class _HomePageState extends State<HomePage> {
     eatenProtein= savedData['eatenProtein'];
     kcalEatenValue= savedData['kcalEatenValue'];
     kcalLeftValue=savedData['kcalLeftValue'];
-    isAdmin=savedData['isAdmin'];
     filledGlasses=savedData['filledGlasses'];
 
 
@@ -254,14 +253,17 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ),
-                    IconButton(
+
+                    isAdmin == false
+                        ? IconButton(
                       icon: Icon(Icons.refresh),
                       color: Colors.white,
                       onPressed: () {
                         // Call the method to refresh the page
                         refreshHomePage();
                       },
-                    ),
+                    )
+                        : Container(), // Empty container if isAdmin is true
                   ],
                 ),
 
