@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'mealSuggestion.dart';
 import 'globals.dart';
 import 'AdminRecipePage.dart';
+import 'DRIcalc.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -87,9 +88,10 @@ class _HomePageState extends State<HomePage> {
           double? weight = _parseDouble(userData['weight']);
           double? height = _parseDouble(userData['height']);
           double? age = _parseDouble(userData['age']);
+          String? gender=userData['gender'];
           // Calculate kcalTotalValue and update state
           setState(() {
-            kcalTotalValue = _calculateTotalKcalValue(weight, height, age);
+            kcalTotalValue = _calculateTotalKcalValue(weight, height, age, gender);
             totalProtein = weight*.9;
             print(totalProtein);
           });
@@ -108,7 +110,7 @@ class _HomePageState extends State<HomePage> {
 
   DateTime selectedDate = DateTime.now();
 
-  int filledGlasses = 0;
+
   static const int totalGlasses = 8;
   static const double volumePerGlass = 0.25;
 
@@ -164,8 +166,13 @@ class _HomePageState extends State<HomePage> {
     return value != null ? double.tryParse(value) ?? 0.0 : 0.0;
   }
 
-  double _calculateTotalKcalValue(double? weight, double? height, double? age) {
-    return 88.362 + (13.397 * (weight ?? 0)) + (4.799 * (height ?? 0)) - (5.677 * (age ?? 0));
+  double _calculateTotalKcalValue(double? weight, double? height, double? age,String? gender) {
+    if (gender == 'male') {
+      return 66.5 + (13.8 * (weight ?? 0)) + (5 * (height ?? 0)) - (6.8 * (age ?? 0));
+    }
+    else{
+      return 655.1 + (9.6 * (weight ?? 0)) + (1.9 * (height ?? 0)) - (4.7 * (age ?? 0));
+    }
   }
   void refreshHomePage() async {
     // Add logic to refresh the data
@@ -187,6 +194,8 @@ class _HomePageState extends State<HomePage> {
     eatenProtein= savedData['eatenProtein'];
     kcalEatenValue= savedData['kcalEatenValue'];
     kcalLeftValue=savedData['kcalLeftValue'];
+    isAdmin=savedData['isAdmin'];
+    filledGlasses=savedData['filledGlasses'];
 
 
     setState(() {
@@ -365,6 +374,19 @@ class _HomePageState extends State<HomePage> {
                                 if (index == filledGlasses) {
                                   setState(() {
                                     filledGlasses++;
+                                    PreferencesService().saveData(
+                                      mealType: mealtype,
+                                      eatenBreakfast: eatenBreakfast,
+                                      eatenDinner: eatenDinner,
+                                      eatenLunch: eatenLunch,
+                                      eatenCarbs: eatenCarbs,
+                                      eatenFat: eatenFat,
+                                      eatenProtein: eatenProtein,
+                                      kcalEatenValue: kcalEatenValue,
+                                      kcalLeftValue: kcalLeftValue,
+                                      isAdmin: isAdmin,
+                                      filledGlasses: filledGlasses,
+                                    );
                                   });
                                 }
                               },
@@ -504,13 +526,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BMICalculatorPage() ),
-                );
-              },
+              onTap: () => _showHealthOptions(context),
               child: Icon(Icons.calculate_outlined),
             ),
             label: 'Health Monitor',
@@ -560,6 +576,43 @@ class _HomePageState extends State<HomePage> {
 
 
 }
+
+void _showHealthOptions(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return SafeArea(
+        child: Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.calculate_outlined),
+              title: Text('BMI Calculator'),
+              onTap: () {
+                Navigator.pop(context); // Close the bottom sheet
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BMICalculatorPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.food_bank_outlined),
+              title: Text('DRI Calculator'),
+              onTap: () {
+                Navigator.pop(context); // Close the bottom sheet
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DRICalculatorPage()),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 
 class CircleValue extends StatelessWidget {
   final String label;

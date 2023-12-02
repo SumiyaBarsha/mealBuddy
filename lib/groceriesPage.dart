@@ -52,7 +52,7 @@ class _MyGroceryPageState extends State<MyGroceryPage> {
           List<GroceryItem> newItems = [];
           values.forEach((key, value) {
             double tmp= (value['amount'] as num).toDouble();
-            if(value['unit']=='KG'){
+            if(value['unit']=='KG'||value['unit']=='L'){
               tmp=tmp/1000;
             }
             newItems.add(GroceryItem(
@@ -195,7 +195,7 @@ Future<void> _uploadGroceryItem(GroceryItem item) async {
       } else {
         // If item does not exist, create a new one
         String itemKey = itemsRef.push().key ?? 'default-key'; // Add a default key or handle null as needed
-        if(item.unit=='KG'){
+        if(item.unit=='KG'||item.unit=='L'){
           item.amount=item.amount*1000;
         }
         await itemsRef.child(itemKey).set({
@@ -214,7 +214,32 @@ Future<void> _uploadGroceryItem(GroceryItem item) async {
 
 Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) async {
   final TextEditingController amountController = TextEditingController();
-  String? selectedUnit;
+  String selectedUnit='pcs';
+  final List<String> itemsKG = [
+    'Bread',
+    'Potato',
+    'Tomato',
+    'Wheat Flour',
+    'Ghee',
+    'Cucumber',
+    'Green Chilli',
+    'Onion',
+    'Chicken',
+    'Cheese',
+    // ... Add more items here
+  ];
+  final List<String> itemsL = [
+    'Milk',
+    'Vegetable Oil',
+    'Mayonnaise',
+    // ... Add more items here
+  ];
+  for (String item in itemsKG) {
+    if(item==itemName)selectedUnit='KG';
+  }
+  for (String item in itemsL) {
+    if(item==itemName)selectedUnit='L';
+  }
 
   // Function to show a dialog for entering the amount
   await showDialog<String>(
@@ -226,7 +251,7 @@ Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) a
           controller: amountController,
           autofocus: true,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(hintText: 'Enter amount'),
+          decoration: InputDecoration(hintText: 'Enter amount in '+selectedUnit),
         ),
         actions: <Widget>[
           TextButton(
@@ -249,36 +274,7 @@ Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) a
   // Only proceed if an amount was entered
   if (amountController.text.isNotEmpty) {
     // Function to show a dialog for selecting a unit
-    selectedUnit = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Unit'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                ListTile(
-                  title: const Text('L'),
-                  onTap: () => Navigator.pop(context, 'L'),
-                ),
-                ListTile(
-                  title: const Text('KG'),
-                  onTap: () => Navigator.pop(context, 'KG'),
-                ),
-                ListTile(
-                  title: const Text('pcs'),
-                  onTap: () => Navigator.pop(context, 'pcs'),
-                ),
-                // ... Add more ListTiles for other units
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    // If a unit was selected, return the new GroceryItem
-    if (selectedUnit != null) {
+    if (amountController != null) {
       double amount = double.tryParse(amountController.text) ?? 0;
       return GroceryItem(itemName, amount, selectedUnit);
     }
@@ -289,18 +285,21 @@ Future<GroceryItem?> _showAddItemDialog(BuildContext context, String itemName) a
 }
 
 
-class SelectionScreen extends StatelessWidget {
-  final List<String> items = [
+class SelectionScreen extends StatefulWidget {
+  @override
+  _SelectionScreenState createState() => _SelectionScreenState();
+}
+
+class _SelectionScreenState extends State<SelectionScreen> {
+  final List<String> allItems = [
     'Milk',
     'Bread',
-    'Potatoes',
-    'Tomatoes',
+    'Potato',
+    'Tomato',
     'Egg',
     'Wheat Flour',
     'Ghee',
-    'Vegetable oil',
-    'Egg White',
-    'All Purpose Flour',
+    'Vegetable Oil',
     'Mayonnaise',
     'Cucumber',
     'Green Chilli',
@@ -310,26 +309,65 @@ class SelectionScreen extends StatelessWidget {
     // ... Add more items here
   ];
 
+  List<String> filteredItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredItems = allItems; // Initially, all items are shown
+  }
+
+  void _filterItems(String query) {
+    final results = allItems.where((item) =>
+        item.toLowerCase().contains(query.toLowerCase())).toList();
+    setState(() {
+      filteredItems = results;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Items'),
+        title: Text(
+          'Select Items',
+          style: TextStyle(color: Colors.white), // Set the AppBar title text color to white
+        ),
+        backgroundColor: Colors.green,
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(items[index]),
-            onTap: () async {
-              final item = await _showAddItemDialog(context, items[index]);
-              if (item != null) {
-                Navigator.pop(context, item);
-              }
-            },
-          );
-        },
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: _filterItems,
+              decoration: InputDecoration(
+                labelText: 'Search',
+                suffixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredItems.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  child: ListTile(
+                    title: Text(filteredItems[index]),
+                    onTap: () async {
+                      final item = await _showAddItemDialog(
+                          context, filteredItems[index]);
+                      if (item != null) {
+                        Navigator.pop(context, item);
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

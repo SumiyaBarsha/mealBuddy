@@ -180,7 +180,7 @@ class _LoginState extends State<Login> {
                 );
                 if (userCredential.user != null) {
                   // Navigate to HomePage
-                  if(emailController.text=='admin@gmail.com'){
+                  if(emailController.text=='b@gmail.com'){
                     isAdmin=true;
                   }
                   else isAdmin=false;
@@ -202,6 +202,8 @@ class _LoginState extends State<Login> {
                     eatenProtein: eatenProtein,
                     kcalEatenValue: kcalEatenValue,
                     kcalLeftValue: kcalLeftValue,
+                    isAdmin: isAdmin,
+                    filledGlasses: filledGlasses,
                   );
                   _navigateToHomePage(context);
                 }else {

@@ -250,7 +250,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Text('Yes'),
+              child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -310,6 +310,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                   child: Text('select'),
                   onPressed: () {
                     print('pressed1');
+
                     tmp=false;
                     print(mealtype);
                     print(eatenBreakfast);
@@ -345,6 +346,9 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
                   child: Text('Close'),
                   onPressed: () {
                     print('pressed2');
+
+
+
                     Navigator.of(context).pop();
                   },
                 ),
@@ -360,8 +364,6 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
 
 
 
-
-
   Future<void> subtractIngredientsFromGrocery(List<dynamic> ingredients, String title,String kcal,String carbs, String fat,String protein) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -372,6 +374,9 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
     String userId = user.uid;
     DatabaseReference itemsRef = FirebaseDatabase.instance.ref('Users/$userId/GroceryItems');
     bool okk=true;
+
+    List<String> insufficientIngredients = [];
+
     for (var entry in ingredients) {
       // Assuming each entry has 'name' and 'amount' keys
 
@@ -396,15 +401,13 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
       }).catchError((error) {
         print("Failed to subtract ingredient: $error");
       });
-      if(ok==false){
-        // Show dialog and wait for the user's response
-        bool shouldContinue = await showConfirmationDialog(context, 'You do not have enough $ingredientName. Do you want to continue?');
-        if (!shouldContinue) {
-          return; // Exit the function early if the user chooses 'No'
-        }
+      if (!ok) {
+        insufficientIngredients.add(ingredientName);
+        okk = false;
       }
       if(ok==false)okk=false;
     }
+
 
     if(okk==true){
       for (var entry in ingredients) {
@@ -452,9 +455,15 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
         eatenProtein: eatenProtein,
         kcalEatenValue: kcalEatenValue,
         kcalLeftValue: kcalLeftValue,
+        isAdmin: isAdmin,
+        filledGlasses: filledGlasses,
       );
 
       await showUpdateConfirmationDialog(context);
+    }
+    else{
+      String insufficientList = insufficientIngredients.join(', ');
+      await showTopMessage(context, 'You do not have enough of the following ingredients: $insufficientList. Do you want to continue?');
     }
     // Be careful with this line - make sure the context is still valid
     Navigator.of(context).pop();
@@ -865,6 +874,7 @@ class _MealSuggestionPageState  extends State<MealSuggestionPage> {
       ),
     );
   }
+
 
 
 }

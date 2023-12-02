@@ -69,6 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
             name = userData['name'] as String?;
             weight = userData['weight'] as String?;
             goal =  userData['goal'] as String?;
+            age = userData['age'] as String?;
             _profileImageUrl = userData['profileImageUrl'] as String?;
           });
         } else {
@@ -226,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             SizedBox(height: 4),
                             Text(
-                                age ?? "-- years old"
+                                (age ?? "--") + " years old"
                             ),
                           ],
                         ),
