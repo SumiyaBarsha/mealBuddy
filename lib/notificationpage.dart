@@ -80,7 +80,8 @@ class _notificationpageState extends State<notificationpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Daily Reminder"),
+        backgroundColor: Colors.green,
+        title: Text("Daily Reminder",style: TextStyle(color: Colors.white),),
         centerTitle: true,
         actions: [
           IconButton(
@@ -91,7 +92,7 @@ class _notificationpageState extends State<notificationpage> {
                 ),
               );
             },
-            icon: Icon(Icons.library_books_rounded),
+            icon: Icon(Icons.library_books_rounded,color: Colors.white,),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:meal_recommender/firebase_api.dart';
 import 'package:meal_recommender/home.dart';
 import 'package:meal_recommender/login.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:meal_recommender/splash.dart';
 import 'firebase_options.dart';
 import 'firebase_api.dart';
 import 'notificationpage.dart';
@@ -27,19 +28,14 @@ void main() async {
   }catch (e) {
     print('Error during initialization: $e');
   }
-  final prefs = await SharedPreferences.getInstance();
-  final userEmail = prefs.getString('userEmail');
-  final bool isLoggedIn = userEmail != null;
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  runApp(MyApp());
 }
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
-  final bool isLoggedIn;
 
-  const MyApp({Key? key, required this.isLoggedIn}) : super(key: key);
-
+  
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -51,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: isLoggedIn ? HomePage() : Login(),
+      home: SplashScreen(),
     );
   }
 }

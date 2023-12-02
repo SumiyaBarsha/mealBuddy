@@ -108,6 +108,7 @@ class _DRICalculatorPageState extends State<DRICalculatorPage> {
                 validator: (value) => value == null || value.isEmpty ? 'Please enter your weight' : null,
               ),
               // Calculate button
+              SizedBox(height: 20.00,),
               ElevatedButton(
                 onPressed: _calculateDRI,
                 child: Text(
