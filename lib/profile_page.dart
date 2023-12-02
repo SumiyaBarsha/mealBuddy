@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meal_recommender/DRIcalc.dart';
 import 'package:meal_recommender/YourAccount.dart';
 import 'package:meal_recommender/dietneedsPage.dart';
 import 'package:meal_recommender/dritool.dart';
@@ -279,7 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => DRIToolPage()),
+                          MaterialPageRoute(builder: (context) => DRICalculatorPage()),
                         );
                       },
                     ),
