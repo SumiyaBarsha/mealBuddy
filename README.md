@@ -4,7 +4,7 @@ A new Flutter project.
 
 ## Getting Started
 
-# App Description:
+## App Description:
 A personalized nutrition app built using Flutter and Firebase that offers daily meal plans based on individual dietary needs such as age, weight, gender, and health goals (e.g., weight loss or gain). It includes a smart recommendation system using a decision tree algorithm to suggest meals aligned with users’ macronutrient targets, a grocery manager that tracks pantry items, and local notifications for reminders. 
 
 | Splash Screen | Home Screen | Login Screen | Register Screen
@@ -23,11 +23,11 @@ A personalized nutrition app built using Flutter and Firebase that offers daily 
 |----------------|----------------|----------------|
 ![App Screenshot](./reminder.png) | ![App Screenshot](./profile.png) | ![App Screenshot](./personaldetail.png) 
 
-# Algorithms Used :
+## Algorithms Used :
 - Greedy Algorithm
 - Sorting Algorithm
 
-# Tools, Language & Technologies:
+## Tools, Language & Technologies:
 - Flutter
 - Firebase Database
 - Dart
