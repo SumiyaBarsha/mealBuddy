@@ -15,23 +15,23 @@ A personalized nutrition app built using Flutter and Firebase that offers daily 
 |-------------|-----------------|-------------|-----------------|
 ![App Screenshot](./bmi.jpg) | ![App Screenshot](./dri.png) | ![App Screenshot](./grocery.png) | ![App Screenshot](./item1.png)
 
-Daily Meal | Meal Plan | Meal Select | Update calorie suggestion 
+| Daily Meal | Meal Plan | Meal Select | Update calorie suggestion 
 |-------------|-----------------|-------------|-----------------|
 ![App Screenshot](./meal_plan.png) | ![App Screenshot](./mealSelect.png) | ![App Screenshot](./home2.png) | ![App Screenshot](./home1.png) 
 
-Daily Reminder | Profile | Profile Settings
-|-------------|-----------------|-------------|-----------------|
+| Daily Reminder | Profile | Profile Settings
+|----------------|----------------|----------------|
 ![App Screenshot](./reminder.png) | ![App Screenshot](./profile.png) | ![App Screenshot](./personaldetail.png) 
 
 #Algorithms Used :
--Greedy Algorithm
--Sorting Algorithm
+- Greedy Algorithm
+- Sorting Algorithm
 
 #Tools, Language & Technologies:
--Flutter
--Firebase Database
--Dart
--Android Studio
+- Flutter
+- Firebase Database
+- Dart
+- Android Studio
 
 A few resources to get you started if this is your first Flutter project:
 
